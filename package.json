@@ -1,0 +1,45 @@
+{
+  "name": "usefavicon",
+  "version": "0.1.0",
+  "homepage": "/usefavicon",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JulesBlm/useFavicon.git"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "private": true,
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/JulesBlm"
+  },
+  "scripts": {
+    "build": "rollup --config"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "rollup": "^2.28.2"
+  }
+}

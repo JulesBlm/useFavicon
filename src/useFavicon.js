@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+// useCallback
+import { useEffect, useState, useRef } from "react";
 
 function useFavicon() {
   const [faviconHref, setFaviconHref] = useState(null);
@@ -34,7 +35,7 @@ function useFavicon() {
   const setEmojiFavicon = (emoji) =>
     setFaviconHref(`data:image/svg+xml,${faviconTemplate(emoji)}`);
 
-    const getCanvas = (faviconSize, scale) => {
+  const getCanvas = (faviconSize) => {
     const canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
@@ -42,13 +43,15 @@ function useFavicon() {
     return canvas;
   };
 
-  const drawOnFavicon = (
+  function drawOnFavicon(
     drawCallback,
-    { faviconSize = 256, clear = false, ...props }
-  ) => {
+    { faviconSize = 256, clear = false, ...props } = {}
+  ) {
     const dpr = window.devicePixelRatio || 1;
 
-    const canvas = getCanvas(faviconSize, dpr);
+    const scaledFaviconSize = faviconSize * dpr;
+
+    const canvas = getCanvas(scaledFaviconSize);
 
     const img = document.createElement("img");
     img.src = faviconHref; // TODO: add option/param to use originalHref
@@ -57,15 +60,14 @@ function useFavicon() {
     img.onload = () => {
       const context = canvas.getContext("2d");
 
-      if (!clear) context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
+      if (!clear) context.drawImage(img, 0, 0, scaledFaviconSize, scaledFaviconSize); // Draw current favicon as background
 
-      console.log(props);
-      drawCallback(context, faviconSize, props);
+      drawCallback(context, scaledFaviconSize, props);
 
       const pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  };
+  }
 
   return {
     faviconHref,

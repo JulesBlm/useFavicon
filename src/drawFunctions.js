@@ -1,10 +1,10 @@
-const drawCircle = (context, faviconSize, props) => {
+const drawCircle = (context, faviconSize, options) => {
   const {
     fillColor = "red",
     radius = faviconSize / 5,
     x = faviconSize - faviconSize / 5,
     y = faviconSize - faviconSize / 5,
-  } = props;
+  } = options;
 
   context.beginPath();
   context.arc(
@@ -18,15 +18,14 @@ const drawCircle = (context, faviconSize, props) => {
   context.fill();
 };
 
-const drawRect = (context, faviconSize, props) => {
+const drawRect = (context, faviconSize, options) => {
   const {
-    fillColor = "yellow",
+    fillColor = "black",
     length = faviconSize / 5,
     x = faviconSize - faviconSize / 5,
     y = faviconSize - faviconSize / 5,
-  } = props;
+  } = options;
 
-  console.log({ fillColor });
   context.beginPath();
   context.fillStyle = fillColor;
   context.fillRect(
@@ -39,16 +38,16 @@ const drawRect = (context, faviconSize, props) => {
 };
 
 // adapted from https://github.com/tommoor/tinycon/blob/master/tinycon.js#L167
-const drawBubble = (context, faviconSize, props) => {
+const drawBubble = (context, faviconSize, options) => {
   const {
     label = "",
     color = "orangered",
     fontSize = faviconSize / 2,
     font = "sans-serif",
-  } = props;
+  } = options;
 
   // these numbers are pure trial and error I should have thought about them more it works ok though
-  // bubble needs to be wider for double digits
+  // bubble needs to be wider for double digits, 4 digits max now
   const extraWidth = (label.length * faviconSize) / 5;
 
   const bubbleWidth = faviconSize / 3 + extraWidth;
