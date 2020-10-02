@@ -8,6 +8,7 @@ function useFavicon() {
 
   // Grab initial favicon on mount
   useEffect(() => {
+    // how do i know this is the right one though?
     const link =
       document.querySelector("link[rel*='icon']") ||
       document.createElement("link");
@@ -47,11 +48,7 @@ function useFavicon() {
     drawCallback,
     { faviconSize = 256, clear = false, ...props } = {}
   ) {
-    const dpr = window.devicePixelRatio || 1;
-
-    const scaledFaviconSize = faviconSize * dpr;
-
-    const canvas = getCanvas(scaledFaviconSize);
+    const canvas = getCanvas(faviconSize);
 
     const img = document.createElement("img");
     img.src = faviconHref; // TODO: add option/param to use originalHref
@@ -60,9 +57,9 @@ function useFavicon() {
     img.onload = () => {
       const context = canvas.getContext("2d");
 
-      if (!clear) context.drawImage(img, 0, 0, scaledFaviconSize, scaledFaviconSize); // Draw current favicon as background
+      if (!clear) context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
 
-      drawCallback(context, scaledFaviconSize, props);
+      drawCallback(context, faviconSize, props);
 
       const pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);

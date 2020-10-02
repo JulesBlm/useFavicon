@@ -36,7 +36,7 @@ code {
 .Demo-Grid {
   display: grid;
   margin: 0 auto;
-  grid-template: repeat(2, 20em) / repeat(4, 16em);
+  grid-template: repeat(2, 20em) / repeat(auto-fit, minmax(16em, 1fr));
   gap: 1.5em;
 }
 
@@ -100,8 +100,13 @@ output {
 }
 
 .Usage {
-  text-align: center;
-  /* opacity: 0.1; */
-  /* background-color: #CBD5E0; */
+  /* text-align: center; */
+}
+
+.code-block {
+  background-color: black;
+  opacity: 0.85;
+  color: white;
   border-radius: 2em;
+  padding: 2em;
 }
