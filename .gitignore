@@ -21,6 +21,8 @@ demo/node_modules
 .env.production.local
 /klad
 
+demo/.cache
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

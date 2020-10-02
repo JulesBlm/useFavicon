@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
-import "./App.css";
-import { useFavicon } from "../../src/useFavicon";
+import { useFavicon } from "./useFavicon";
 import { drawCircle, drawRect, drawBubble } from "../../src/drawFunctions";
+import "./App.css";
 
 const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
   const [isOutdated, setIsOutdated] = useState(false);

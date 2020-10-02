@@ -2627,6 +2627,7 @@ function useFavicon() {
 
 
   react.useEffect(function () {
+    // how do i know this is the right one though?
     var link = document.querySelector("link[rel*='icon']") || document.createElement("link");
     refOfFaviconTag.current = link;
     setFaviconHref(refOfFaviconTag.current.href);
@@ -2663,18 +2664,16 @@ function useFavicon() {
         clear = _ref$clear === void 0 ? false : _ref$clear,
         props = _objectWithoutProperties(_ref, ["faviconSize", "clear"]);
 
-    var dpr = window.devicePixelRatio || 1;
-    var scaledFaviconSize = faviconSize * dpr;
-    var canvas = getCanvas(scaledFaviconSize);
+    var canvas = getCanvas(faviconSize);
     var img = document.createElement("img");
     img.src = faviconHref; // TODO: add option/param to use originalHref
     // The load event fires when a given resource has loaded so when the img src has changed
 
     img.onload = function () {
       var context = canvas.getContext("2d");
-      if (!clear) context.drawImage(img, 0, 0, scaledFaviconSize, scaledFaviconSize); // Draw current favicon as background
+      if (!clear) context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
 
-      drawCallback(context, scaledFaviconSize, props);
+      drawCallback(context, faviconSize, props);
       var pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
