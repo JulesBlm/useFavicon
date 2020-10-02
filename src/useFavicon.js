@@ -34,7 +34,7 @@ function useFavicon() {
   const setEmojiFavicon = (emoji) =>
     setFaviconHref(`data:image/svg+xml,${faviconTemplate(emoji)}`);
 
-    const getCanvas = (faviconSize, scale) => {
+  const getCanvas = (faviconSize, scale) => {
     const canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
@@ -42,10 +42,10 @@ function useFavicon() {
     return canvas;
   };
 
-  const drawOnFavicon = (
+  function drawOnFavicon(
     drawCallback,
-    { faviconSize = 256, clear = false, ...props }
-  ) => {
+    { faviconSize = 256, clear = false, ...props } = {}
+  ) {
     const dpr = window.devicePixelRatio || 1;
 
     const canvas = getCanvas(faviconSize, dpr);
@@ -65,7 +65,7 @@ function useFavicon() {
       const pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  };
+  }
 
   return {
     faviconHref,
