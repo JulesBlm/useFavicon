@@ -1,5 +1,7 @@
 {
   "name": "usefavicon",
+  "description": "useFavicon - a React Hook to control the favicon",
+  "homepage": "https://jules.engineer/usefavicon",
   "version": "0.1.0",
   "repository": {
     "type": "git",
@@ -7,8 +9,9 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.es.js",
+  "license": "MIT",
   "private": true,
-  "dependencies": {
+  "peerDependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },

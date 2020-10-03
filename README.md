@@ -63,4 +63,5 @@ Three simple canvas draw functions are included: `drawCircle`, `drawRect`, and `
 - What if there are multiple `<link rel="icon">` tags?
 - Implement SVG drawCallbacks similar to the canvas drawCallbacks. Pass a function that creates an SVG element which then get drawn on the favicon.
   - [Dark mode for SVG favicon swith `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
-- Tests
+- Tests with jest
+- Improve my dont-know-what-i'm-doing rollup and babel configs, maybe use [microbundle](https://github.com/developit/microbundle) instead

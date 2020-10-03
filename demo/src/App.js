@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
-import { useFavicon } from "./useFavicon";
-import { drawCircle, drawRect, drawBubble } from "../../src/drawFunctions";
+// parcel breaks when importing from files one level up
+import { drawBubble, drawCircle, drawRect, useFavicon } from "./index.es";
 import "./App.css";
 
 const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
@@ -9,7 +9,6 @@ const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
 
   // Yes i know I shouldn't ignore drawOnFavicon an restoreFavicon in deps array
   useEffect(() => {
-    console.log("Running effect!");
     if (isOutdated) {
       drawOnFavicon(drawCircle, {
         faviconSize: 128,
@@ -180,7 +179,10 @@ function App() {
               </button>
             </div>
             <div className="Demo-Item">
-              <p>Draw rectangle with default options (black, right lower corner) on top of the favicon</p>
+              <p>
+                Draw rectangle with default options (black, right lower corner)
+                on top of the favicon
+              </p>
               <button
                 className="Button"
                 onClick={() => drawOnFavicon(drawRect)}
@@ -190,7 +192,8 @@ function App() {
             </div>
             <div className="Demo-Item">
               <p>
-                Draw a rectangle on top of the favicon in a custom postion and color
+                Draw a rectangle on top of the favicon in a custom postion and
+                color
               </p>
               <button
                 className="Button"

@@ -64,8 +64,6 @@ const drawBubble = (context, faviconSize, options) => {
         : faviconSize - bubbleWidth / 4.75,
     textY = faviconSize - bubbleHeight / 8;
 
-  console.log({ bubbleWidth }, bubbleWidth / 5);
-
   context.fillStyle = color;
   context.lineWidth = 12;
 
