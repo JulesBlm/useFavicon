@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+.h1 {
+  text-shadow: 3px 3px 0px #5362F6;
+}
+
 .App {
   color: white;
   background: linear-gradient(230deg, #4b79cf, #4bc5cf);

@@ -59,6 +59,7 @@ Three simple canvas draw functions are included: `drawCircle`, `drawRect`, and `
 
 ## Ideas & Loose Ends
 
+- Make an SVG favicon with JSX: SVG JSX to SVG string to SVG href string
 - Option to draw on the original favicon, not just the latest
 - What if there are multiple `<link rel="icon">` tags?
 - Implement SVG drawCallbacks similar to the canvas drawCallbacks. Pass a function that creates an SVG element which then get drawn on the favicon.

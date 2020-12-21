@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 // parcel breaks when importing from files one level up
 import { drawBubble, drawCircle, drawRect, useFavicon } from "./index.es";
 import "./App.css";
@@ -131,11 +132,31 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>useFavicon</h1>
+        <h1 className="h1">
+          useFavicon{" "}
+          <a
+            href="https://github.com/JulesBlm/useFavicon"
+            title="useFavicon GitHub Repository"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-label="GitHub"
+              width="1em"
+              viewBox="0 0 512 512"
+            >
+              <rect width="512" height="512" rx="15%" fill="#1B1817" />
+              <path
+                fill="#fff"
+                d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z"
+              />
+            </svg>
+          </a>
+        </h1>
         <img
           src={faviconHref}
           width={"150px"}
           height={"150px"}
+          alt="This is a big copy of your favicon for demo purposes"
           title="This is a big copy of your favicon for demo purposes"
         />
         <h2>

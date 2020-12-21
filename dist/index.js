@@ -112,7 +112,7 @@ function useFavicon() {
 
   react.useEffect(function () {
     // how do i know this is the right one though?
-    var link = document.querySelector("link[rel*='icon']") || document.createElement("link");
+    var link = document.querySelector("link[rel~='icon']") || document.head.appendChild(document.createElement("link"));
     refOfFaviconTag.current = link;
     setFaviconHref(refOfFaviconTag.current.href);
     setOriginalHref(refOfFaviconTag.current.href);
@@ -120,27 +120,22 @@ function useFavicon() {
   react.useEffect(function () {
     refOfFaviconTag.current.setAttribute("href", faviconHref); // refOfFaviconTag.current.href = faviconHref; // not sure which is better
   }, [faviconHref]);
-
-  var restoreFavicon = function restoreFavicon() {
+  var restoreFavicon = react.useCallback(function () {
     return setFaviconHref(originalHref);
-  };
-
-  var faviconTemplate = function faviconTemplate(emoji) {
+  });
+  var svgFaviconTemplate = react.useCallback(function (emoji) {
     return "<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>\n        <text y=%22.9em%22 font-size=%2290%22>\n          ".concat(emoji, "\n        </text>\n      </svg>\n    ").trim();
-  };
-
-  var setEmojiFavicon = function setEmojiFavicon(emoji) {
-    return setFaviconHref("data:image/svg+xml,".concat(faviconTemplate(emoji)));
-  };
-
-  var getCanvas = function getCanvas(faviconSize) {
+  });
+  var setEmojiFavicon = react.useCallback(function (emoji) {
+    return setFaviconHref("data:image/svg+xml,".concat(svgFaviconTemplate(emoji)));
+  });
+  var getCanvas = react.useCallback(function (faviconSize) {
     var canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
     return canvas;
-  };
-
-  function drawOnFavicon(drawCallback) {
+  });
+  var drawOnFavicon = react.useCallback(function (drawCallback) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
         _ref$faviconSize = _ref.faviconSize,
         faviconSize = _ref$faviconSize === void 0 ? 256 : _ref$faviconSize,
@@ -161,8 +156,7 @@ function useFavicon() {
       var pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  }
-
+  });
   return {
     faviconHref: faviconHref,
     restoreFavicon: restoreFavicon,
