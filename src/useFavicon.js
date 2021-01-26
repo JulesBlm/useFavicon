@@ -1,4 +1,3 @@
-// useCallback
 import { useEffect, useState, useRef, useCallback } from "react";
 
 function useFavicon() {
@@ -23,7 +22,9 @@ function useFavicon() {
     // refOfFaviconTag.current.href = faviconHref; // not sure which is better
   }, [faviconHref]);
 
-  const restoreFavicon = useCallback(() => setFaviconHref(originalHref));
+  const restoreFavicon = useCallback(() => setFaviconHref(originalHref), [
+    originalHref,
+  ]);
 
   const svgFaviconTemplate = useCallback((emoji) =>
     `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
@@ -32,28 +33,28 @@ function useFavicon() {
         </text>
       </svg>
     `.trim()
-  );
+  , []);
 
   const setEmojiFavicon = useCallback((emoji) =>
     setFaviconHref(`data:image/svg+xml,${svgFaviconTemplate(emoji)}`)
-  );
+  , [svgFaviconTemplate]);
 
-  const getCanvas = useCallback((faviconSize) => {
+  const createCanvas = useCallback((faviconSize) => {
     const canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
 
     return canvas;
-  });
+  }, []);
 
   const drawOnFavicon = useCallback(
     (drawCallback, { faviconSize = 256, clear = false, ...props } = {}) => {
-      const canvas = getCanvas(faviconSize);
+      const canvas = createCanvas(faviconSize);
 
       const img = document.createElement("img");
       img.src = faviconHref; // TODO: add option/param to use originalHref
 
-      // The load event fires when a given resource has loaded so when the img src has changed
+      // The load event fires when a given resource has loaded, so when the <img> src attribute has changed
       img.onload = () => {
         const context = canvas.getContext("2d");
 
@@ -65,7 +66,7 @@ function useFavicon() {
         setFaviconHref(pngURI);
       };
     }
-  );
+  , [createCanvas, faviconHref]);
 
   return {
     faviconHref,
