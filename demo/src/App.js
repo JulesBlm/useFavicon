@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 import * as React from "react";
 import { useEffect, useState } from "react";
 // parcel breaks when importing from files one level up
@@ -21,7 +20,7 @@ const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
     } else {
       restoreFavicon();
     }
-  }, [isOutdated]);
+  }, [isOutdated, drawOnFavicon, restoreFavicon]);
 
   return (
     <div className="Demo-Item">
@@ -312,7 +311,7 @@ function App() {
   />
 </svg>)
 
-// from JSX to Favicon!🪄
+// from JSX to Favicon!🪄,
 jsxToFavicon(Favicon)
 `}
                 </code>

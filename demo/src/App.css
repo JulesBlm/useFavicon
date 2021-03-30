@@ -103,11 +103,9 @@ output {
   font-size: 1.1em;
 }
 
-.Usage {
-  /* text-align: center; */
-}
 
 .code-block {
+  overflow: auto;
   background-color: black;
   opacity: 0.85;
   color: white;
