@@ -20,7 +20,7 @@ const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
     } else {
       restoreFavicon();
     }
-  }, [isOutdated, drawOnFavicon, restoreFavicon]);
+  }, [isOutdated]);
 
   return (
     <div className="Demo-Item">
