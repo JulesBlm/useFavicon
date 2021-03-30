@@ -1,13 +1,15 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 function useFavicon() {
-  const [faviconHref, setFaviconHref] = useState(null);
-  const refOfFaviconTag = useRef(null); // the name faviconRef would be too similar to faviconHref
-  const [originalHref, setOriginalHref] = useState(null);
+  const [faviconHref, setFaviconHref] = React.useState(null);
+  const refOfFaviconTag = React.useRef(null); // the name faviconRef would be too similar to faviconHref
+  const [originalHref, setOriginalHref] = React.useState(null);
 
   // Grab initial favicon on mount
-  useEffect(() => {
-    // how do i know this is the right one though?
+  React.useEffect(() => {
+    // how do i know this is the right one for sure though?
+    // querySelectorAll("link[rel~='icon']")
     const link =
       document.querySelector("link[rel~='icon']") ||
       document.head.appendChild(document.createElement("link"));
@@ -17,29 +19,41 @@ function useFavicon() {
     setOriginalHref(refOfFaviconTag.current.href);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     refOfFaviconTag.current.setAttribute("href", faviconHref);
-    // refOfFaviconTag.current.href = faviconHref; // not sure which is better
   }, [faviconHref]);
 
-  const restoreFavicon = useCallback(() => setFaviconHref(originalHref), [
+  const restoreFavicon = React.useCallback(() => setFaviconHref(originalHref), [
     originalHref,
   ]);
 
-  const svgFaviconTemplate = useCallback((emoji) =>
-    `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
+  const svgFaviconTemplate = React.useCallback(
+    (emoji) =>
+      `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
         <text y=%22.9em%22 font-size=%2290%22>
           ${emoji}
         </text>
       </svg>
-    `.trim()
-  , []);
+    `.trim(),
+    []
+  );
 
-  const setEmojiFavicon = useCallback((emoji) =>
-    setFaviconHref(`data:image/svg+xml,${svgFaviconTemplate(emoji)}`)
-  , [svgFaviconTemplate]);
+  const jsxToFavicon = React.useCallback((SvgEl) => {
+    if ((<SvgEl />).type().type !== "svg")
+      throw Error("React component for jsxToFavicon must a <svg> element");
 
-  const createCanvas = useCallback((faviconSize) => {
+    const replacedQuotes = renderToStaticMarkup(<SvgEl />).replace(/"/g, "%22");
+    const replacedHashes = replacedQuotes.replace(/#/g, "%23");
+    setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
+  }, []);
+
+  const setEmojiFavicon = React.useCallback(
+    (emoji) =>
+      setFaviconHref(`data:image/svg+xml,${svgFaviconTemplate(emoji)}`),
+    [svgFaviconTemplate]
+  );
+
+  const createCanvas = React.useCallback((faviconSize) => {
     const canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
@@ -47,12 +61,12 @@ function useFavicon() {
     return canvas;
   }, []);
 
-  const drawOnFavicon = useCallback(
+  const drawOnFavicon = React.useCallback(
     (drawCallback, { faviconSize = 256, clear = false, ...props } = {}) => {
       const canvas = createCanvas(faviconSize);
 
       const img = document.createElement("img");
-      img.src = faviconHref; // TODO: add option/param to use originalHref
+      img.src = faviconHref;
 
       // The load event fires when a given resource has loaded, so when the <img> src attribute has changed
       img.onload = () => {
@@ -65,11 +79,13 @@ function useFavicon() {
         const pngURI = canvas.toDataURL("image/png");
         setFaviconHref(pngURI);
       };
-    }
-  , [createCanvas, faviconHref]);
+    },
+    [createCanvas, faviconHref]
+  );
 
   return {
     faviconHref,
+    jsxToFavicon,
     restoreFavicon,
     drawOnFavicon,
     setFaviconHref,

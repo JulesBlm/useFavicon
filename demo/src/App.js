@@ -84,13 +84,29 @@ const TextDemoItem = ({ drawOnFavicon }) => {
   );
 };
 
+const demoSvg = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="256"
+    height="256"
+    viewBox="0 0 100 100"
+  >
+    <rect width="100" height="100" rx="20" fill="black" />
+    <path
+      fill="lavender"
+      d="M36.63 22.42L66.52 22.42Q66.78 22.87 67.06 23.63Q67.32 24.40 67.32 25.30L67.32 25.30Q67.32 26.83 66.60 27.73Q65.88 28.63 64.53 28.63L64.53 28.63L40.05 28.63L40.05 47.35L63.36 47.35Q63.63 47.80 63.91 48.56Q64.17 49.33 64.17 50.23L64.17 50.23Q64.17 51.76 63.45 52.66Q62.73 53.56 61.38 53.56L61.38 53.56L40.05 53.56L40.05 77.05Q39.60 77.23 38.66 77.41Q37.71 77.59 36.72 77.59L36.72 77.59Q32.67 77.59 32.67 74.34L32.67 74.34L32.67 26.38Q32.67 24.58 33.75 23.50Q34.84 22.42 36.63 22.42L36.63 22.42Z"
+    />
+  </svg>
+);
+
 function App() {
   const {
     faviconHref,
+    setFaviconHref,
     restoreFavicon,
     drawOnFavicon,
     setEmojiFavicon,
-    setFaviconHref,
+    jsxToFavicon,
   } = useFavicon();
 
   const someEmojis = [
@@ -168,7 +184,7 @@ function App() {
       </header>
 
       <main className="Main">
-        <div className="Demo">
+        <section className="Demo">
           <div className="Demo-Grid">
             <div className="Demo-Item">
               <p>
@@ -271,6 +287,43 @@ function App() {
 
             <div className="Demo-Item">
               <p>
+                Construct an SVG element with <abbr>JSX</abbr> and pass that to{" "}
+                <code>jsxToFavicon()</code>, note <mark>only SVG elements</mark>{" "}
+                work.
+              </p>
+              <pre className="code-block">
+                <code>
+                  {`const Favicon= () => (<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="256"
+  height="256"
+  viewBox="0 0 100 100"
+>
+  <rect
+    width="100"
+    height="100"
+    rx="20"
+    fill="black"
+  />
+  {/* Path of letter F */}
+  <path
+    fill="lavender"
+    d="M36.63 22.42L66....."
+  />
+</svg>)
+
+// from JSX to Favicon!🪄
+jsxToFavicon(Favicon)
+`}
+                </code>
+              </pre>
+              <button className="Button" onClick={() => jsxToFavicon(demoSvg)}>
+                Set favicon with JSX
+              </button>
+            </div>
+
+            <div className="Demo-Item">
+              <p>
                 Set an emoji as the favicon with <code>setEmojiFavicon()</code>,
                 credits to{" "}
                 <a href="https://twitter.com/LeaVerou/status/1241619866475474946?s=20">
@@ -295,14 +348,14 @@ function App() {
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="Usage">
+        <section className="Usage">
           <h2>Usage</h2>
           <pre className="code-block">
             <code>
               {`
-import { useFavicon } from "./useFavicon";
+import { useFavicon } from "./use-favicon";
 import { drawCircle, drawRect, drawBubble } from "./drawFunctions";
 
 function App() {
@@ -319,7 +372,7 @@ function App() {
   `}
             </code>
           </pre>
-        </div>
+        </section>
       </main>
     </div>
   );

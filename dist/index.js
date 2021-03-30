@@ -2,7 +2,30 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var react = require('react');
+var React = require('react');
+var server = require('react-dom/server');
+
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () {
+            return e[k];
+          }
+        });
+      }
+    });
+  }
+  n['default'] = e;
+  return Object.freeze(n);
+}
+
+var React__namespace = /*#__PURE__*/_interopNamespace(React);
 
 function _objectWithoutPropertiesLoose(source, excluded) {
   if (source == null) return {};
@@ -97,45 +120,52 @@ function _nonIterableRest() {
 }
 
 function useFavicon() {
-  var _useState = react.useState(null),
-      _useState2 = _slicedToArray(_useState, 2),
-      faviconHref = _useState2[0],
-      setFaviconHref = _useState2[1];
+  var _React$useState = React__namespace.useState(null),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      faviconHref = _React$useState2[0],
+      setFaviconHref = _React$useState2[1];
 
-  var refOfFaviconTag = react.useRef(null); // the name faviconRef would be too similar to faviconHref
+  var refOfFaviconTag = React__namespace.useRef(null); // the name faviconRef would be too similar to faviconHref
 
-  var _useState3 = react.useState(null),
-      _useState4 = _slicedToArray(_useState3, 2),
-      originalHref = _useState4[0],
-      setOriginalHref = _useState4[1]; // Grab initial favicon on mount
+  var _React$useState3 = React__namespace.useState(null),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      originalHref = _React$useState4[0],
+      setOriginalHref = _React$useState4[1]; // Grab initial favicon on mount
 
 
-  react.useEffect(function () {
-    // how do i know this is the right one though?
+  React__namespace.useEffect(function () {
+    // how do i know this is the right one for sure though?
+    // querySelectorAll("link[rel~='icon']")
     var link = document.querySelector("link[rel~='icon']") || document.head.appendChild(document.createElement("link"));
     refOfFaviconTag.current = link;
     setFaviconHref(refOfFaviconTag.current.href);
     setOriginalHref(refOfFaviconTag.current.href);
   }, []);
-  react.useEffect(function () {
-    refOfFaviconTag.current.setAttribute("href", faviconHref); // refOfFaviconTag.current.href = faviconHref; // not sure which is better
+  React__namespace.useEffect(function () {
+    refOfFaviconTag.current.setAttribute("href", faviconHref);
   }, [faviconHref]);
-  var restoreFavicon = react.useCallback(function () {
+  var restoreFavicon = React__namespace.useCallback(function () {
     return setFaviconHref(originalHref);
-  });
-  var svgFaviconTemplate = react.useCallback(function (emoji) {
+  }, [originalHref]);
+  var svgFaviconTemplate = React__namespace.useCallback(function (emoji) {
     return "<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>\n        <text y=%22.9em%22 font-size=%2290%22>\n          ".concat(emoji, "\n        </text>\n      </svg>\n    ").trim();
-  });
-  var setEmojiFavicon = react.useCallback(function (emoji) {
+  }, []);
+  var jsxToFavicon = React__namespace.useCallback(function (SvgEl) {
+    if ( /*#__PURE__*/React__namespace.createElement(SvgEl, null).type().type !== "svg") throw Error("React component for jsxToFavicon must a <svg> element");
+    var replacedQuotes = server.renderToStaticMarkup( /*#__PURE__*/React__namespace.createElement(SvgEl, null)).replace(/"/g, "%22");
+    var replacedHashes = replacedQuotes.replace(/#/g, "%23");
+    setFaviconHref("data:image/svg+xml,".concat(replacedHashes));
+  }, []);
+  var setEmojiFavicon = React__namespace.useCallback(function (emoji) {
     return setFaviconHref("data:image/svg+xml,".concat(svgFaviconTemplate(emoji)));
-  });
-  var getCanvas = react.useCallback(function (faviconSize) {
+  }, [svgFaviconTemplate]);
+  var createCanvas = React__namespace.useCallback(function (faviconSize) {
     var canvas = document.createElement("canvas");
     canvas.width = faviconSize;
     canvas.height = faviconSize;
     return canvas;
-  });
-  var drawOnFavicon = react.useCallback(function (drawCallback) {
+  }, []);
+  var drawOnFavicon = React__namespace.useCallback(function (drawCallback) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
         _ref$faviconSize = _ref.faviconSize,
         faviconSize = _ref$faviconSize === void 0 ? 256 : _ref$faviconSize,
@@ -143,10 +173,9 @@ function useFavicon() {
         clear = _ref$clear === void 0 ? false : _ref$clear,
         props = _objectWithoutProperties(_ref, ["faviconSize", "clear"]);
 
-    var canvas = getCanvas(faviconSize);
+    var canvas = createCanvas(faviconSize);
     var img = document.createElement("img");
-    img.src = faviconHref; // TODO: add option/param to use originalHref
-    // The load event fires when a given resource has loaded so when the img src has changed
+    img.src = faviconHref; // The load event fires when a given resource has loaded, so when the <img> src attribute has changed
 
     img.onload = function () {
       var context = canvas.getContext("2d");
@@ -156,9 +185,10 @@ function useFavicon() {
       var pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  });
+  }, [createCanvas, faviconHref]);
   return {
     faviconHref: faviconHref,
+    jsxToFavicon: jsxToFavicon,
     restoreFavicon: restoreFavicon,
     drawOnFavicon: drawOnFavicon,
     setFaviconHref: setFaviconHref,
