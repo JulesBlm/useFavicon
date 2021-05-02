@@ -2,11 +2,11 @@
 
 [Check a live demo here](https://jules.engineer/usefavicon/)
 
-A React.js hook to control the favicon, update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress. Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
+A React.js hook to control the favicon, update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
 
-Because React doesn't have access to the favicon tag (`<link rel="icon" href="favicon.svg">`), we use the following attribute selector `link[rel*='icon']` to get it and set it to a [React ref](https://reactjs.org/docs/hooks-reference.html#useref).
+Because React doesn't have access to the favicon HTML tag (`<link rel="icon" href="favicon.svg">`), the following attribute selector is used `link[rel*='icon']` to get it and set it to a [React ref](https://reactjs.org/docs/hooks-reference.html#useref).
 
-# Usage
+## Usage
 
 ```javascript
 import { useFavicon } from "./useFavicon";
@@ -52,6 +52,7 @@ Three simple canvas draw functions are included: `drawCircle`, `drawRect`, and `
 
 ## Credits & Inspiration
 
+- [Joel Califa: Tiny Wins](https://joelcalifa.com/blog/tiny-wins/)
 - [CSS Tricks: Emojis as Favicons](https://css-tricks.com/emojis-as-favicons/)
 - [svg-crowbar](https://github.com/cy6erskunk/svg-crowbar/)
 - [MDN Canvas tutorial](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
@@ -61,9 +62,8 @@ Three simple canvas draw functions are included: `drawCircle`, `drawRect`, and `
 
 ## Ideas & Loose Ends
 
-- Make an SVG favicon with JSX: SVG JSX to SVG string to SVG href string
 - Option to draw on the original favicon, not just the latest
-- What if there are multiple `<link rel="icon">` tags?
+- Not the querySelector always works. What if there are multiple `<link rel="icon">` tags?
 - Implement SVG drawCallbacks similar to the canvas drawCallbacks. Pass a function that creates an SVG element which then get drawn on the favicon.
   - [Dark mode for SVG favicon swith `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
 - Tests with jest
