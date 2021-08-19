@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 function useFavicon() {
   const [faviconHref, setFaviconHref] = React.useState(null);
-  const refOfFaviconTag = React.useRef(null); // the name faviconRef would be too similar to faviconHref
+  const refOfFaviconTag = React.useRef(null);
   const [originalHref, setOriginalHref] = React.useState(null);
 
   // Grab initial favicon on mount
@@ -23,9 +23,10 @@ function useFavicon() {
     refOfFaviconTag.current.setAttribute("href", faviconHref);
   }, [faviconHref]);
 
-  const restoreFavicon = React.useCallback(() => setFaviconHref(originalHref), [
-    originalHref,
-  ]);
+  const restoreFavicon = React.useCallback(
+    () => setFaviconHref(originalHref),
+    [originalHref]
+  );
 
   const svgFaviconTemplate = React.useCallback(
     (emoji) =>
@@ -40,10 +41,10 @@ function useFavicon() {
 
   const jsxToFavicon = React.useCallback((SvgEl) => {
     if ((<SvgEl />).type().type !== "svg")
-      throw Error("React component for jsxToFavicon must a <svg> element");
+      throw Error("React component for 'jsxToFavicon' must of type <svg>");
 
     const replacedQuotes = renderToStaticMarkup(<SvgEl />).replace(/"/g, "%22");
-    const replacedHashes = replacedQuotes.replace(/#/g, "%23");
+    const replacedHashes = replacedQuotes.replace(/#/g, "%23"); // encodeURIComponent?
     setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
   }, []);
 
@@ -83,14 +84,16 @@ function useFavicon() {
     [createCanvas, faviconHref]
   );
 
-  return {
+  return [
     faviconHref,
-    jsxToFavicon,
-    restoreFavicon,
-    drawOnFavicon,
-    setFaviconHref,
-    setEmojiFavicon,
-  };
+    {
+      jsxToFavicon,
+      restoreFavicon,
+      drawOnFavicon,
+      setFaviconHref,
+      setEmojiFavicon,
+    },
+  ];
 }
 
 export { useFavicon };

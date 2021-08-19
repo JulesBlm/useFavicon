@@ -22,7 +22,7 @@ function App() {
 }
 ```
 
-The hook returns an object containing
+The hook returns an array containing `faviconHref` and an object of setters.
 
 - `faviconHref` the current href string of the favicon tag
 
