@@ -1,4 +1,19 @@
-const drawCircle = (context, faviconSize, options) => {
+interface Options {
+  label: string;
+  color : string;
+  fontSize: number;
+  font: number;
+  fillColor: string;
+  radius: number;
+  x: number;
+  y: number;
+}
+
+const drawCircle = (
+  context: CanvasRenderingContext2D,
+  faviconSize: number,
+  options: Options
+) => {
   const {
     fillColor = "red",
     radius = faviconSize / 5,
@@ -18,7 +33,11 @@ const drawCircle = (context, faviconSize, options) => {
   context.fill();
 };
 
-const drawRect = (context, faviconSize, options) => {
+const drawRect = (
+  context: CanvasRenderingContext2D,
+  faviconSize: number,
+  options: any
+) => {
   const {
     fillColor = "black",
     length = faviconSize / 5,
@@ -38,7 +57,11 @@ const drawRect = (context, faviconSize, options) => {
 };
 
 // adapted from https://github.com/tommoor/tinycon/blob/master/tinycon.js#L167
-const drawBubble = (context, faviconSize, options) => {
+const drawBubble = (
+  context: CanvasRenderingContext2D,
+  faviconSize: number,
+  options: any
+) => {
   const {
     label = "",
     color = "orangered",
