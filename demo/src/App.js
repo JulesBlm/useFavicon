@@ -150,11 +150,11 @@ function App() {
       <main className="Main">
         <section className="Demo">
           <div className="Demo-Grid">
-          
+
             <div className="Demo-Item">
               <p>
-                The <code>href</code> of the initial favicon is stored so you
-                can always reset it with <code>restoreFavicon()</code>
+                The initial <code>href</code> of the favicon element is stored so you
+                can always restore the original with <code>restoreFavicon()</code>
               </p>
               <button className="Button" onClick={() => restoreFavicon()}>
                 Restore
@@ -218,8 +218,14 @@ function App() {
 
             <div className="Demo-Item">
               <p>
-                By setting <code>clear: true</code> in the config object, the
+                By setting <code>clear: true</code> in the <code>drawOnFavicon()</code> config parameter, the
                 current favicon is removed
+                <code>{`drawOnFavicon(drawSquare, {
+  faviconSize: 256,
+  fillColor: "purple",
+  clear: true,
+})`}
+                  </code>
               </p>
               <button
                 className="Button"
