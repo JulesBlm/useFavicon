@@ -1,48 +1,12 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-// parcel breaks when importing from files one level up
-import { drawBubble, drawCircle, drawRect, useFavicon } from "./index.es";
+import {
+  drawTextBubble,
+  drawCircle,
+  drawSquare,
+  useFavicon,
+} from "./usefavicon.modern";
 import "./App.css";
-
-const StatefulDemoItem = ({ drawOnFavicon, restoreFavicon }) => {
-  const [isOutdated, setIsOutdated] = useState(false);
-
-  // Yes i know I shouldn't ignore drawOnFavicon an restoreFavicon in deps array
-  useEffect(() => {
-    if (isOutdated) {
-      drawOnFavicon(drawCircle, {
-        faviconSize: 128,
-        fillColor: "purple",
-        radius: 40,
-        x: 128 - 60,
-        y: 128 / 2,
-      });
-    } else {
-      restoreFavicon();
-    }
-  }, [isOutdated, drawOnFavicon, restoreFavicon]);
-
-  return (
-    <div className="Demo-Item">
-      <p>
-        Make your favicon react to state with a simple <code>useEffect</code>.
-        <code>drawOnFavicon</code> when it's true and{" "}
-        <code>restoreFavicon</code> when it's not.
-        {/* for example to notify the user if something's outdated. */}
-      </p>
-      <div className="State-Pill" title="Current state">
-        <label>Outdated: </label>
-        <output>{isOutdated.toString()}</output>
-      </div>
-      <button
-        className="Button"
-        onClick={() => setIsOutdated((state) => !state)}
-      >
-        Toggle state
-      </button>
-    </div>
-  );
-};
 
 const TextDemoItem = ({ drawOnFavicon }) => {
   const [input, setInput] = useState("5");
@@ -69,7 +33,7 @@ const TextDemoItem = ({ drawOnFavicon }) => {
       <button
         className="Button"
         onClick={() =>
-          drawOnFavicon(drawBubble, {
+          drawOnFavicon(drawTextBubble, {
             faviconSize: 256,
             clear: false,
             color: "crimson",
@@ -92,54 +56,55 @@ const demoSvg = (
   >
     <rect width="100" height="100" rx="20" fill="black" />
     <path
-      fill="lavender"
+      fill="hotpink"
       d="M36.63 22.42L66.52 22.42Q66.78 22.87 67.06 23.63Q67.32 24.40 67.32 25.30L67.32 25.30Q67.32 26.83 66.60 27.73Q65.88 28.63 64.53 28.63L64.53 28.63L40.05 28.63L40.05 47.35L63.36 47.35Q63.63 47.80 63.91 48.56Q64.17 49.33 64.17 50.23L64.17 50.23Q64.17 51.76 63.45 52.66Q62.73 53.56 61.38 53.56L61.38 53.56L40.05 53.56L40.05 77.05Q39.60 77.23 38.66 77.41Q37.71 77.59 36.72 77.59L36.72 77.59Q32.67 77.59 32.67 74.34L32.67 74.34L32.67 26.38Q32.67 24.58 33.75 23.50Q34.84 22.42 36.63 22.42L36.63 22.42Z"
     />
   </svg>
 );
 
+const someEmojis = [
+  "😎",
+  "👹",
+  "👻",
+  "👔",
+  "🎒",
+  "🧀",
+  "❤️",
+  "💯",
+  "⚛️",
+  "🌇",
+  "🏞",
+  "🌅",
+  "🏙",
+  "⚽️",
+  "🦦",
+  "🦥",
+  "🦧",
+  "🐳",
+  "🍆",
+  "🍔",
+  "🚥",
+  "📱",
+  "💈",
+  "💶",
+  "🍿",
+  "🌚",
+  "🌝",
+  "🌞",
+  "🙉",
+  "🐼",
+];
+
 function App() {
+  const [faviconHref, setters] = useFavicon();
+
   const {
-    faviconHref,
     setFaviconHref,
     restoreFavicon,
     drawOnFavicon,
     setEmojiFavicon,
     jsxToFavicon,
-  } = useFavicon();
-
-  const someEmojis = [
-    "😎",
-    "👹",
-    "👻",
-    "👔",
-    "🎒",
-    "🧀",
-    "❤️",
-    "💯",
-    "⚛️",
-    "🌇",
-    "🏞",
-    "🌅",
-    "🏙",
-    "⚽️",
-    "🦦",
-    "🦥",
-    "🦧",
-    "🐳",
-    "🍆",
-    "🍔",
-    "🚥",
-    "📱",
-    "💈",
-    "💶",
-    "🍿",
-    "🌚",
-    "🌝",
-    "🌞",
-    "🙉",
-    "🐼",
-  ];
+  } = setters;
 
   const randomEmoji = () =>
     someEmojis[Math.floor(Math.random() * someEmojis.length)];
@@ -169,8 +134,8 @@ function App() {
         </h1>
         <img
           src={faviconHref}
-          width={"150px"}
-          height={"150px"}
+          width="150px"
+          height="150px"
           alt="This is a big copy of your favicon for demo purposes"
           title="This is a big copy of your favicon for demo purposes"
         />
@@ -185,6 +150,7 @@ function App() {
       <main className="Main">
         <section className="Demo">
           <div className="Demo-Grid">
+          
             <div className="Demo-Item">
               <p>
                 The <code>href</code> of the initial favicon is stored so you
@@ -194,6 +160,7 @@ function App() {
                 Restore
               </button>
             </div>
+
             <div className="Demo-Item">
               <p>
                 Draw a circle on top of the favicon in the lower right corner
@@ -221,7 +188,7 @@ function App() {
               </p>
               <button
                 className="Button"
-                onClick={() => drawOnFavicon(drawRect)}
+                onClick={() => drawOnFavicon(drawSquare)}
               >
                 Draw rectangle
               </button>
@@ -234,7 +201,7 @@ function App() {
               <button
                 className="Button"
                 onClick={() =>
-                  drawOnFavicon(drawRect, {
+                  drawOnFavicon(drawSquare, {
                     faviconSize: 128,
                     fillColor: "crimson",
                     length: 30,
@@ -246,21 +213,18 @@ function App() {
                 Draw rectangle
               </button>
             </div>
-            <StatefulDemoItem
-              drawOnFavicon={drawOnFavicon}
-              restoreFavicon={restoreFavicon}
-            />
+
             <TextDemoItem drawOnFavicon={drawOnFavicon} />
 
             <div className="Demo-Item">
               <p>
                 By setting <code>clear: true</code> in the config object, the
-                existing favicon is removed
+                current favicon is removed
               </p>
               <button
                 className="Button"
                 onClick={() =>
-                  drawOnFavicon(drawRect, {
+                  drawOnFavicon(drawSquare, {
                     faviconSize: 256,
                     fillColor: "purple",
                     clear: true,
@@ -286,13 +250,16 @@ function App() {
 
             <div className="Demo-Item">
               <p>
-                Construct an SVG element with <abbr>JSX</abbr> and pass that to{" "}
-                <code>jsxToFavicon()</code>, note <mark>only SVG elements</mark>{" "}
-                work.
+                Construct a React SVG element with <abbr>JSX</abbr> and pass
+                that to <code>jsxToFavicon()</code>, note{" "}
+                <mark>
+                  only React elements of type <code>svg</code>
+                </mark>{" "}
+                will work.
               </p>
               <pre className="code-block">
                 <code>
-                  {`const Favicon= () => (<svg
+                  {`const faviconSvgEl = (<svg
   xmlns="http://www.w3.org/2000/svg"
   width="256"
   height="256"
@@ -306,13 +273,13 @@ function App() {
   />
   {/* Path of letter F */}
   <path
-    fill="lavender"
+    fill="hotpink"
     d="M36.63 22.42L66....."
   />
 </svg>)
 
 // from JSX to Favicon!🪄,
-jsxToFavicon(Favicon)
+jsxToFavicon(faviconSvgEl)
 `}
                 </code>
               </pre>
@@ -336,8 +303,8 @@ jsxToFavicon(Favicon)
                 >
                   Chris Coyier
                 </a>
-                . Note that you can use any character, just know that they don't
-                work as well as emoji's.
+                . Note that you can use any character not just emoji's, just
+                know that they don&apos;t work as well as emoji&apos;s.
               </p>
               <button
                 className="Button"
@@ -355,17 +322,19 @@ jsxToFavicon(Favicon)
             <code>
               {`
 import { useFavicon } from "./use-favicon";
-import { drawCircle, drawRect, drawBubble } from "./drawFunctions";
+import { drawCircle, drawSquare, drawTextBubble } from "./drawFunctions";
 
 function App() {
 
-  const {
+  const [
     faviconHref,
-    restoreFavicon,
-    drawOnFavicon,
-    setEmojiFavicon,
-    setFaviconHref,
-  } = useFavicon();
+    { 
+      restoreFavicon,
+      drawOnFavicon,
+      setEmojiFavicon,
+      setFaviconHref
+    }
+  ] = useFavicon();
   
   ...
   `}

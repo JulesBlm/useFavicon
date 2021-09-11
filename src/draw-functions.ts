@@ -1,24 +1,21 @@
-interface Options {
-  label: string;
-  color : string;
-  fontSize: number;
-  font: number;
+interface DrawCircleOptions {
   fillColor: string;
   radius: number;
   x: number;
   y: number;
 }
 
-const drawCircle = (
+export const drawCircle = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
-  options: Options
+  options: DrawCircleOptions
 ) => {
   const {
     fillColor = "red",
     radius = faviconSize / 5,
     x = faviconSize - faviconSize / 5,
     y = faviconSize - faviconSize / 5,
+    
   } = options;
 
   context.beginPath();
@@ -33,10 +30,17 @@ const drawCircle = (
   context.fill();
 };
 
-const drawRect = (
+interface DrawSquareOptions {
+  fillColor: string;
+  length: number;
+  x: number;
+  y: number;
+}
+
+export const drawSquare = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
-  options: any
+  options: DrawSquareOptions
 ) => {
   const {
     fillColor = "black",
@@ -50,17 +54,24 @@ const drawRect = (
   context.fillRect(
     x,
     y,
-    length, // width
-    length // height
+    length, 
+    length 
   );
   context.fill();
 };
 
+interface DrawTextBubbleOptions {
+  label: string;
+  color: string;
+  fontSize: number;
+  font: string;
+}
+
 // adapted from https://github.com/tommoor/tinycon/blob/master/tinycon.js#L167
-const drawBubble = (
+export const drawTextBubble = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
-  options: any
+  options: Partial<DrawTextBubbleOptions>
 ) => {
   const {
     label = "",
@@ -122,4 +133,3 @@ const drawBubble = (
   context.fillText(label, textX, textY);
 };
 
-export { drawCircle, drawBubble, drawRect };

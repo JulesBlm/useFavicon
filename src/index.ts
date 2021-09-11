@@ -1,2 +1,2 @@
 export { useFavicon } from "./use-favicon";
-export { drawCircle, drawBubble, drawRect } from "./draw-functions";
+export { drawCircle, drawTextBubble, drawSquare } from "./draw-functions";

@@ -42,13 +42,13 @@ The hook returns an array containing `faviconHref` and an object of setters.
 
 - `setEmojiFavicon(emoji)` a function to set the favicon to an emoji. Technically, you can use any character, just know that most text characters don't work as well as emoji's as favicons.
 
-- `jsxToFavicon(SvgEl)` a function that takes in an SVG React component, renders it to a string and sets it as the favicon. Only SVG components are allowed!
+- `jsxToFavicon(SvgEl)` a function that takes in an SVG React Element, renders it to a string and sets it as the favicon. Only SVG-type React elements are allowed!
 
 ## Draw functions
 
 Draw functions take three parameters: a `context` object, `faviconSize`, and a `props` object.
 
-Three simple canvas draw functions are included: `drawCircle`, `drawRect`, and `drawBubble`,
+Three simple canvas draw functions are included: `drawCircle`, `drawSquare`, and `drawTextBubble`,
 
 ## Credits & Inspiration
 
