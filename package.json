@@ -1,5 +1,5 @@
 {
-  "name": "usefavicon",
+  "name": "react-usefavicon",
   "description": "useFavicon - a React Hook to modify the favicon",
   "author": "Jules Blom (https://twitter.com/MegaJules)",
   "private": false,
@@ -33,9 +33,7 @@
     "build:react": "microbundle --define process.env.NODE_ENV=production --name usefavicon --no-compress --output dist/",
     "build:ci": "microbundle --define process.env.NODE_ENV=production --name usefavicon --output dist/",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest",
-    "test:watch": "cross-env NODE_ENV=test npm run test -- --watch",
-    "prepublishOnly": "npm run test && npm run lint && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "browserslist": {
     "production": [

@@ -1,30 +1,49 @@
-# useFavicon
+# react-usefavicon
+
+[![npm version](https://badge.fury.io/js/react-usefavicon.svg)](https://www.npmjs.com/package/react-usefavicon)
+
 
 [Check a live demo here](https://jules.engineer/usefavicon/)
 
-A React.js hook to control the favicon, update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
+react-usefavicon is a a React.js hook to control the favicon. Use it to update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
 
-Because React doesn't have access to the favicon HTML tag (`<link rel="icon" href="favicon.svg">`), the following attribute selector is used `link[rel*='icon']` to get it and set it to a [React ref](https://reactjs.org/docs/hooks-reference.html#useref).
+## Installing
+
+If you use npm
+
+```bash
+npm install react-usefavicon
+```
+
+For yarn
+
+```bash
+yarn add react-usefavicon
+```
 
 ## Usage
 
 ```javascript
-import { useFavicon } from "./useFavicon";
+import { useFavicon } from "react-usefavicon";
 
 function App() {
-  const {
+  const [
     faviconHref,
-    restoreFavicon,
-    drawOnFavicon,
-    setEmojiFavicon,
-    setFaviconHref,
-  } = useFavicon();
+    {
+      restoreFavicon,
+      drawOnFavicon,
+      setEmojiFavicon,
+      setFaviconHref,
+    }
+   ] = useFavicon();
 }
 ```
 
-The hook returns an array containing `faviconHref` and an object of setters.
+The hook returns an array containing `faviconHref` and an object of setter functions.
 
-- `faviconHref` the current href string of the favicon tag
+- `faviconHref` the current href string of the favicon link element
+
+The setters object contains the following functions
 
 - `restoreFavicon()` a function to reset the favicon to whatever it was on mount
 
@@ -63,8 +82,6 @@ Three simple canvas draw functions are included: `drawCircle`, `drawSquare`, and
 ## Ideas & Loose Ends
 
 - Option to draw on the original favicon, not just the latest
-- Not the querySelector always works. What if there are multiple `<link rel="icon">` tags?
-- Implement SVG drawCallbacks similar to the canvas drawCallbacks. Pass a function that creates an SVG element which then get drawn on the favicon.
-  - [Dark mode for SVG favicon swith `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
+- Not sure if the querySelector always works. What if there are multiple `<link rel="icon">` tags?
+- [Dark mode for SVG favicon swith `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
 - Tests with jest
-- Improve my dont-know-what-i'm-doing rollup and babel configs, maybe use [microbundle](https://github.com/developit/microbundle) instead
