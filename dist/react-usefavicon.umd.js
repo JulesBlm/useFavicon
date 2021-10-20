@@ -66,7 +66,7 @@
 
 
     React__namespace.useEffect(function () {
-      // how do i know this is the right one for sure though?
+      // how do i know this is the right link element for sure though?
       var linkEl = document.querySelector("link[rel~='icon']") || document.head.appendChild(document.createElement("link"));
       faviconTagRef.current = linkEl;
       setFaviconHref(faviconTagRef.current.href);
@@ -114,14 +114,17 @@
         var pngURI = canvas.toDataURL("image/png");
         setFaviconHref(pngURI);
       };
-    }, [createCanvas, faviconHref]);
-    return [faviconHref, {
-      jsxToFavicon: jsxToFavicon,
-      restoreFavicon: restoreFavicon,
-      drawOnFavicon: drawOnFavicon,
-      setFaviconHref: setFaviconHref,
-      setEmojiFavicon: setEmojiFavicon
-    }];
+    }, [faviconHref]);
+    var handlers = React__namespace.useMemo(function () {
+      return {
+        jsxToFavicon: jsxToFavicon,
+        restoreFavicon: restoreFavicon,
+        drawOnFavicon: drawOnFavicon,
+        setFaviconHref: setFaviconHref,
+        setEmojiFavicon: setEmojiFavicon
+      };
+    }, [jsxToFavicon, restoreFavicon, drawOnFavicon, setFaviconHref, setEmojiFavicon]);
+    return [faviconHref, handlers];
   }
 
   var drawCircle = function drawCircle(context, faviconSize, options) {
@@ -214,4 +217,4 @@
   exports.useFavicon = useFavicon;
 
 })));
-//# sourceMappingURL=usefavicon.umd.js.map
+//# sourceMappingURL=react-usefavicon.umd.js.map

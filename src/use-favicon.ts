@@ -24,7 +24,7 @@ function useFavicon() {
 
   // Grab initial favicon on mount
   React.useEffect(() => {
-    // how do i know this is the right one for sure though?
+    // how do i know this is the right link element for sure though?
     const linkEl: HTMLLinkElement =
       document.querySelector("link[rel~='icon']") ||
       document.head.appendChild(document.createElement("link"));
@@ -36,8 +36,9 @@ function useFavicon() {
   }, []);
 
   React.useEffect(() => {
-    faviconTagRef.current!.setAttribute("href", faviconHref);
+    faviconTagRef.current.setAttribute("href", faviconHref);
   }, [faviconHref]);
+
 
   const restoreFavicon = React.useCallback(() => {
     setFaviconHref(originalHref);
@@ -48,7 +49,7 @@ function useFavicon() {
       throw Error("React element for 'jsxToFavicon' must of type 'svg'");
 
     const renderedToString = renderToStaticMarkup(SvgEl);
-    const encoded = encodeURIComponent(renderedToString); 
+    const encoded = encodeURIComponent(renderedToString);
     const replacedHashes = encoded.replace(/#/g, "%23");
 
     setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
@@ -74,28 +75,35 @@ function useFavicon() {
           return;
         }
 
-        if (!clear)
-          context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
+        if (!clear) context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
 
-        drawCallback(context!, faviconSize, props);
+        drawCallback(context, faviconSize, props);
 
         const pngURI = canvas.toDataURL("image/png");
         setFaviconHref(pngURI);
       };
     },
-    [createCanvas, faviconHref]
+    [faviconHref]
   );
 
-  return [
-    faviconHref,
-    {
+  const handlers = React.useMemo(
+    () => ({
       jsxToFavicon,
       restoreFavicon,
       drawOnFavicon,
       setFaviconHref,
       setEmojiFavicon,
-    },
-  ];
+    }),
+    [
+      jsxToFavicon,
+      restoreFavicon,
+      drawOnFavicon,
+      setFaviconHref,
+      setEmojiFavicon,
+    ]
+  );
+
+  return [faviconHref, handlers];
 }
 
 export { useFavicon };

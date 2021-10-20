@@ -38,7 +38,7 @@ function useFavicon() {
   const [originalHref, setOriginalHref] = React.useState(null); // Grab initial favicon on mount
 
   React.useEffect(() => {
-    // how do i know this is the right one for sure though?
+    // how do i know this is the right link element for sure though?
     const linkEl = document.querySelector("link[rel~='icon']") || document.head.appendChild(document.createElement("link"));
     faviconTagRef.current = linkEl;
     setFaviconHref(faviconTagRef.current.href);
@@ -85,14 +85,15 @@ function useFavicon() {
       const pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  }, [createCanvas, faviconHref]);
-  return [faviconHref, {
+  }, [faviconHref]);
+  const handlers = React.useMemo(() => ({
     jsxToFavicon,
     restoreFavicon,
     drawOnFavicon,
     setFaviconHref,
     setEmojiFavicon
-  }];
+  }), [jsxToFavicon, restoreFavicon, drawOnFavicon, setFaviconHref, setEmojiFavicon]);
+  return [faviconHref, handlers];
 }
 
 const drawCircle = (context, faviconSize, options) => {
@@ -174,4 +175,4 @@ const drawTextBubble = (context, faviconSize, options) => {
 };
 
 export { drawCircle, drawSquare, drawTextBubble, useFavicon };
-//# sourceMappingURL=usefavicon.modern.js.map
+//# sourceMappingURL=react-usefavicon.modern.js.map

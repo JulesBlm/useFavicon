@@ -1,27 +1,5 @@
-var React = require('react');
-var server = require('react-dom/server');
-
-function _interopNamespace(e) {
-  if (e && e.__esModule) return e;
-  var n = Object.create(null);
-  if (e) {
-    Object.keys(e).forEach(function (k) {
-      if (k !== 'default') {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(n, k, d.get ? d : {
-          enumerable: true,
-          get: function () {
-            return e[k];
-          }
-        });
-      }
-    });
-  }
-  n['default'] = e;
-  return n;
-}
-
-var React__namespace = /*#__PURE__*/_interopNamespace(React);
+import * as React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 function _objectWithoutPropertiesLoose(source, excluded) {
   if (source == null) return {};
@@ -52,41 +30,41 @@ var svgFaviconTemplate = function svgFaviconTemplate(emoji) {
 };
 
 function useFavicon() {
-  var _React$useState = React__namespace.useState(null),
+  var _React$useState = React.useState(null),
       faviconHref = _React$useState[0],
       setFaviconHref = _React$useState[1];
 
-  var faviconTagRef = React__namespace.useRef(null);
+  var faviconTagRef = React.useRef(null);
 
-  var _React$useState2 = React__namespace.useState(null),
+  var _React$useState2 = React.useState(null),
       originalHref = _React$useState2[0],
       setOriginalHref = _React$useState2[1]; // Grab initial favicon on mount
 
 
-  React__namespace.useEffect(function () {
-    // how do i know this is the right one for sure though?
+  React.useEffect(function () {
+    // how do i know this is the right link element for sure though?
     var linkEl = document.querySelector("link[rel~='icon']") || document.head.appendChild(document.createElement("link"));
     faviconTagRef.current = linkEl;
     setFaviconHref(faviconTagRef.current.href);
     setOriginalHref(faviconTagRef.current.href);
   }, []);
-  React__namespace.useEffect(function () {
+  React.useEffect(function () {
     faviconTagRef.current.setAttribute("href", faviconHref);
   }, [faviconHref]);
-  var restoreFavicon = React__namespace.useCallback(function () {
+  var restoreFavicon = React.useCallback(function () {
     setFaviconHref(originalHref);
   }, [originalHref]);
-  var jsxToFavicon = React__namespace.useCallback(function (SvgEl) {
+  var jsxToFavicon = React.useCallback(function (SvgEl) {
     if (SvgEl.type !== "svg") throw Error("React element for 'jsxToFavicon' must of type 'svg'");
-    var renderedToString = server.renderToStaticMarkup(SvgEl);
+    var renderedToString = renderToStaticMarkup(SvgEl);
     var encoded = encodeURIComponent(renderedToString);
     var replacedHashes = encoded.replace(/#/g, "%23");
     setFaviconHref("data:image/svg+xml," + replacedHashes);
   }, []);
-  var setEmojiFavicon = React__namespace.useCallback(function (emoji) {
+  var setEmojiFavicon = React.useCallback(function (emoji) {
     setFaviconHref("data:image/svg+xml," + svgFaviconTemplate(emoji));
   }, []);
-  var drawOnFavicon = React__namespace.useCallback(function (drawCallback, _temp) {
+  var drawOnFavicon = React.useCallback(function (drawCallback, _temp) {
     var _ref = _temp === void 0 ? {} : _temp,
         _ref$faviconSize = _ref.faviconSize,
         faviconSize = _ref$faviconSize === void 0 ? 256 : _ref$faviconSize,
@@ -112,14 +90,17 @@ function useFavicon() {
       var pngURI = canvas.toDataURL("image/png");
       setFaviconHref(pngURI);
     };
-  }, [createCanvas, faviconHref]);
-  return [faviconHref, {
-    jsxToFavicon: jsxToFavicon,
-    restoreFavicon: restoreFavicon,
-    drawOnFavicon: drawOnFavicon,
-    setFaviconHref: setFaviconHref,
-    setEmojiFavicon: setEmojiFavicon
-  }];
+  }, [faviconHref]);
+  var handlers = React.useMemo(function () {
+    return {
+      jsxToFavicon: jsxToFavicon,
+      restoreFavicon: restoreFavicon,
+      drawOnFavicon: drawOnFavicon,
+      setFaviconHref: setFaviconHref,
+      setEmojiFavicon: setEmojiFavicon
+    };
+  }, [jsxToFavicon, restoreFavicon, drawOnFavicon, setFaviconHref, setEmojiFavicon]);
+  return [faviconHref, handlers];
 }
 
 var drawCircle = function drawCircle(context, faviconSize, options) {
@@ -206,8 +187,5 @@ var drawTextBubble = function drawTextBubble(context, faviconSize, options) {
   context.fillText(label, textX, textY);
 };
 
-exports.drawCircle = drawCircle;
-exports.drawSquare = drawSquare;
-exports.drawTextBubble = drawTextBubble;
-exports.useFavicon = useFavicon;
-//# sourceMappingURL=usefavicon.js.map
+export { drawCircle, drawSquare, drawTextBubble, useFavicon };
+//# sourceMappingURL=react-usefavicon.module.js.map
