@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/react-usefavicon.svg)](https://www.npmjs.com/package/react-usefavicon)
 
-
 [Check a live demo here](https://jules.engineer/usefavicon/)
 
 react-usefavicon is a a React.js hook to control the favicon. Use it to update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
@@ -34,8 +33,9 @@ function App() {
       drawOnFavicon,
       setEmojiFavicon,
       setFaviconHref,
-    }
-   ] = useFavicon();
+      jsxToFavicon,
+    },
+  ] = useFavicon();
 }
 ```
 
