@@ -102,7 +102,7 @@ function useFavicon() {
     ]
   );
 
-  return [faviconHref, handlers];
+  return [faviconHref, handlers] as const;
 }
 
 export { useFavicon };
