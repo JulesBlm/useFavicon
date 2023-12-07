@@ -1,5 +1,9 @@
 # react-usefavicon
 
+> [!CAUTION]
+> This is meant for Single-Page React Apps. If you're using a React framework like Next.js or Remix, there are better ways to set the favicon.
+
+
 [![npm version](https://badge.fury.io/js/react-usefavicon.svg)](https://www.npmjs.com/package/react-usefavicon)
 
 [Check a live demo here](https://jules.engineer/usefavicon/)
