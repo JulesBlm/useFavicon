@@ -1,7 +1,7 @@
 import * as React from "react";
 export type DrawCallback = (context: CanvasRenderingContext2D, faviconSize: number, options: Record<PropertyKey, unknown>) => void;
 declare function useFavicon(): readonly [string, {
-    jsxToFavicon: (SvgEl: React.ReactSVGElement) => void;
+    jsxToFavicon: (SvgEl: React.ReactSVGElement) => Promise<void>;
     restoreFavicon: () => void;
     drawOnFavicon: (drawCallback: DrawCallback, { faviconSize, clear, ...options }?: {
         faviconSize?: number | undefined;
