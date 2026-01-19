@@ -9,7 +9,7 @@ export const drawCircle = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: DrawCircleOptions
-) => {
+): void => {
   const {
     fillColor = "red",
     radius = faviconSize / 5,
@@ -41,7 +41,7 @@ export const drawSquare = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: DrawSquareOptions
-) => {
+): void => {
   const {
     fillColor = "black",
     length = faviconSize / 5,
@@ -81,7 +81,7 @@ export const drawTextBubble = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: Partial<DrawTextBubbleOptions>
-) => {
+): void => {
   const {
     label = "",
     color = "orangered",
