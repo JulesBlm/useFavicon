@@ -1,14 +1,12 @@
 # react-usefavicon
 
-> [!CAUTION]
-> This is meant for Single-Page React Apps. If you're using a React framework like Next.js or Remix, there are better ways to set the favicon.
-
-
 [![npm version](https://badge.fury.io/js/react-usefavicon.svg)](https://www.npmjs.com/package/react-usefavicon)
 
 [Check a live demo here](https://jules.engineer/usefavicon/)
 
-react-usefavicon is a a React.js hook to control the favicon. Use it to update the favicon with a url, base64 encoded image or an emoji in an SVG. Draw anything on top of the favicon, badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify and Slack and many more websites do this to and strangely I couldn't find a React hook for it, so I made my own.
+react-usefavicon is a React.js hook to dynamically control the favicon. Use it to update the favicon with a URL, base64 encoded image, or an emoji in an SVG. Draw anything on top of the favicon: badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify, Slack, and many more websites use this technique.
+
+**Works with modern React frameworks**: Next.js (App Router & Pages Router), React Router, TanStack Router, Remix, and more. Fully SSR-safe!
 
 ## Installing
 
@@ -66,6 +64,84 @@ The setters object contains the following functions
 - `setEmojiFavicon(emoji)` a function to set the favicon to an emoji. Technically, you can use any character, just know that most text characters don't work as well as emoji's as favicons.
 
 - `jsxToFavicon(SvgEl)` a function that takes in an SVG React Element, renders it to a string and sets it as the favicon. Only SVG-type React elements are allowed!
+
+## Framework-Specific Usage
+
+### Next.js (App Router)
+
+```jsx
+'use client'; // Required for client-side hooks
+
+import { useFavicon } from "react-usefavicon";
+
+export default function MyComponent() {
+  const [faviconHref, { setEmojiFavicon, restoreFavicon }] = useFavicon();
+
+  return (
+    <button onClick={() => setEmojiFavicon("🚀")}>
+      Change Favicon
+    </button>
+  );
+}
+```
+
+### Next.js (Pages Router)
+
+```jsx
+import { useFavicon } from "react-usefavicon";
+
+export default function MyPage() {
+  const [faviconHref, { setEmojiFavicon }] = useFavicon();
+
+  // Works seamlessly in Pages Router
+  return <button onClick={() => setEmojiFavicon("⚡")}>Update</button>;
+}
+```
+
+### React Router / TanStack Router
+
+```jsx
+import { useFavicon } from "react-usefavicon";
+
+function MyRoute() {
+  const [faviconHref, { drawOnFavicon, restoreFavicon }] = useFavicon();
+
+  // Update favicon based on route status
+  React.useEffect(() => {
+    drawOnFavicon((ctx, size) => {
+      ctx.fillStyle = "red";
+      ctx.fillRect(size - 20, 0, 20, 20);
+    });
+
+    return () => restoreFavicon();
+  }, []);
+
+  return <div>My Route</div>;
+}
+```
+
+### Remix
+
+```jsx
+// app/routes/dashboard.tsx
+import { useFavicon } from "react-usefavicon";
+
+export default function Dashboard() {
+  const [, { setEmojiFavicon }] = useFavicon();
+
+  return (
+    <button onClick={() => setEmojiFavicon("📊")}>
+      Dashboard View
+    </button>
+  );
+}
+```
+
+## Server-Side Rendering (SSR)
+
+This library is fully SSR-safe. When running on the server (during SSR/SSG), the hook will safely no-op and avoid accessing browser APIs like `document` and `window`. The favicon will update once the component hydrates on the client.
+
+This means you can use `useFavicon` in any React framework without worrying about SSR errors.
 
 ## Draw functions
 

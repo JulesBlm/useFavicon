@@ -1,6 +1,6 @@
 {
   "name": "react-usefavicon",
-  "description": "useFavicon - a React Hook to modify the favicon",
+  "description": "useFavicon - a React Hook to dynamically modify the favicon. SSR-safe, works with Next.js, React Router, TanStack Router, Remix, and more.",
   "author": "Jules Blom (https://twitter.com/Mega_Jules)",
   "private": false,
   "homepage": "https://jules.engineer/usefavicon",
@@ -22,7 +22,15 @@
   "keywords": [
     "favicon",
     "react",
-    "react-hook"
+    "react-hook",
+    "nextjs",
+    "next.js",
+    "react-router",
+    "tanstack-router",
+    "remix",
+    "ssr",
+    "dynamic-favicon",
+    "emoji-favicon"
   ],
   "funding": {
     "type": "github",
@@ -74,8 +82,8 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "react": ">= 16.8.0 || ^17",
-    "react-dom": ">= 16.8.0 || ^17"
+    "react": ">= 16.8.0",
+    "react-dom": ">= 16.8.0"
   },
   "files": [
     "src",

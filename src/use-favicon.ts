@@ -25,6 +25,11 @@ function useFavicon() {
 
   // Grab initial favicon on mount
   React.useEffect(() => {
+    // SSR-safe: only run in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
     // how do i know this is the right link element for sure though?
     const linkEl: HTMLLinkElement =
       document.querySelector("link[rel~='icon']") ||
@@ -37,7 +42,11 @@ function useFavicon() {
   }, []);
 
   React.useEffect(() => {
-      faviconTagRef.current.setAttribute("href", faviconHref);
+    // SSR-safe: only run in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined' || !faviconTagRef.current) {
+      return;
+    }
+    faviconTagRef.current.setAttribute("href", faviconHref);
   }, [faviconHref]);
 
   const restoreFavicon = React.useCallback(() => {
@@ -64,6 +73,12 @@ function useFavicon() {
       drawCallback: DrawCallback,
       { faviconSize = 256, clear = false, ...options } = {}
     ) => {
+      // SSR-safe: only run in browser environment
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        console.warn('drawOnFavicon is not available in server-side rendering environments');
+        return;
+      }
+
       const canvas = createCanvas(faviconSize);
 
       const img = document.createElement("img");
