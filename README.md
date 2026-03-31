@@ -4,9 +4,11 @@
 
 [Check a live demo here](https://jules.engineer/usefavicon/)
 
-react-usefavicon is a React.js hook to dynamically control the favicon. Use it to update the favicon with a URL, base64 encoded image, or an emoji in an SVG. Draw anything on top of the favicon: badges, text, checkmarks, anything! This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Netlify, Slack, and many more websites use this technique.
+react-usefavicon is a React hook to dynamically draw on your favicon. Composite badges, text bubbles, progress indicators, or anything you can draw on a canvas onto your existing favicon. This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Slack, and many more websites use this technique.
 
 **Works with modern React frameworks**: Next.js (App Router & Pages Router), React Router, TanStack Router, Remix, and more. Fully SSR-safe!
+
+> **React 19 note**: If you just need to set a static favicon URL, React 19 supports rendering `<link rel="icon" href={href} />` directly in your components — React will hoist it to `<head>` for you. This hook is most valuable when you need to **draw on** the favicon using canvas (badges, overlays, dynamic text).
 
 ## Installing
 
@@ -24,130 +26,125 @@ yarn add react-usefavicon
 
 ## Usage
 
-```javascript
-import { useFavicon } from "react-usefavicon";
+```js
+import { useFavicon, emojiSvg } from "react-usefavicon";
 
-function App() {
-  const [
-    faviconHref,
-    {
-      restoreFavicon,
-      drawOnFavicon,
-      setEmojiFavicon,
-      setFaviconHref,
-      jsxToFavicon,
-    },
-  ] = useFavicon();
-}
+const { drawOnFavicon, restoreFavicon, setFaviconHref, svgToFavicon } = useFavicon();
 ```
 
-The hook returns an array containing `faviconHref` and an object of setter functions.
+Returns an object of stable handler functions.
 
-- `faviconHref` the current href string of the favicon link element
+### Draw on the favicon
 
-The setters object contains the following functions
-
-- `restoreFavicon()` a function to reset the favicon to whatever it was on mount
-
-- `drawFavicon(drawCallback, [{ options }]}` creates a canvas, copies the current favicon to it and calls `drawCallback`.
-
-  - `drawCallback` (required) is a user-supplied function takes in a newly created [canvas context](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D), which you can draw anything on with the [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Basic_usage). So whatever you can draw on `<canvas>`, you can put it on your favicon!
-  - `options` object (optional) with two configurable properties.
-    - `faviconSize` to set the size of the canvas. Default is `256` px
-    - `clear` boolean to start with a blank canvas instead of the favicon. Default is `false`
-    - `...props` all other props in the options object are passed on to `drawCallback`.
-
-  Note: If you call `drawFavicon` multiple times in successsion, the drawings will stack on top of each other. Simply call `restoreFavicon` before calling `drawFavicon` again to ensure you're drawing on the clean, original favicon.
-
-- `setFaviconHref(href)` a function to set the href of the favicon tag manually, for example to switch to another static favicon image.
-
-- `setEmojiFavicon(emoji)` a function to set the favicon to an emoji. Technically, you can use any character, just know that most text characters don't work as well as emoji's as favicons.
-
-- `jsxToFavicon(SvgEl)` a function that takes in an SVG React Element, renders it to a string and sets it as the favicon. Only SVG-type React elements are allowed!
-
-## Framework-Specific Usage
-
-### Next.js (App Router)
+Draw anything on top of the current favicon using the [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D). The current favicon is drawn as the background first, then your callback runs on top.
 
 ```jsx
-'use client'; // Required for client-side hooks
+import { useFavicon, drawCircle, drawTextBubble } from "react-usefavicon";
 
-import { useFavicon } from "react-usefavicon";
+function Notifications({ count }) {
+  const { drawOnFavicon, restoreFavicon } = useFavicon();
 
-export default function MyComponent() {
-  const [faviconHref, { setEmojiFavicon, restoreFavicon }] = useFavicon();
+  useEffect(() => {
+    if (count > 0) {
+      drawOnFavicon(drawCircle, { fillColor: "red", radius: 40, x: 200, y: 200 });
+    } else {
+      restoreFavicon();
+    }
+  }, [count, drawOnFavicon, restoreFavicon]);
 
-  return (
-    <button onClick={() => setEmojiFavicon("🚀")}>
-      Change Favicon
-    </button>
-  );
+  return <span>{count} notifications</span>;
 }
 ```
 
-### Next.js (Pages Router)
+Or write your own draw callback. It receives the canvas context, the favicon size, and any extra options you pass:
 
 ```jsx
-import { useFavicon } from "react-usefavicon";
-
-export default function MyPage() {
-  const [faviconHref, { setEmojiFavicon }] = useFavicon();
-
-  // Works seamlessly in Pages Router
-  return <button onClick={() => setEmojiFavicon("⚡")}>Update</button>;
-}
+drawOnFavicon((ctx, size) => {
+  ctx.fillStyle = "green";
+  ctx.beginPath();
+  ctx.arc(size - 30, size - 30, 25, 0, Math.PI * 2);
+  ctx.fill();
+});
 ```
 
-### React Router / TanStack Router
+#### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `faviconSize` | `number` | `256` | Canvas size in px |
+| `clear` | `boolean` | `false` | Start with a blank canvas instead of drawing over the current favicon |
+| `...rest` | `any` | — | Passed through as the third argument to your draw callback |
+
+If you call `drawOnFavicon` multiple times, drawings stack. Call `restoreFavicon()` first to draw on the clean original.
+
+### Built-in draw functions
+
+Three draw helpers are included for common patterns:
+
+```js
+import { drawCircle, drawTextBubble, drawSquare } from "react-usefavicon";
+```
+
+**`drawCircle`** — draws a filled circle (notification dot)
 
 ```jsx
-import { useFavicon } from "react-usefavicon";
-
-function MyRoute() {
-  const [faviconHref, { drawOnFavicon, restoreFavicon }] = useFavicon();
-
-  // Update favicon based on route status
-  React.useEffect(() => {
-    drawOnFavicon((ctx, size) => {
-      ctx.fillStyle = "red";
-      ctx.fillRect(size - 20, 0, 20, 20);
-    });
-
-    return () => restoreFavicon();
-  }, []);
-
-  return <div>My Route</div>;
-}
+drawOnFavicon(drawCircle, { fillColor: "red", radius: 40, x: 200, y: 200 });
 ```
 
-### Remix
+**`drawTextBubble`** — draws a rounded badge with a text label (unread count)
 
 ```jsx
-// app/routes/dashboard.tsx
-import { useFavicon } from "react-usefavicon";
-
-export default function Dashboard() {
-  const [, { setEmojiFavicon }] = useFavicon();
-
-  return (
-    <button onClick={() => setEmojiFavicon("📊")}>
-      Dashboard View
-    </button>
-  );
-}
+drawOnFavicon(drawTextBubble, { label: "3", color: "orangered", fontSize: 128, font: "sans-serif" });
 ```
 
-## Server-Side Rendering (SSR)
+**`drawSquare`** — draws a filled square
 
-This library is fully SSR-safe. When running on the server (during SSR/SSG), the hook will safely no-op and avoid accessing browser APIs like `document` and `window`. The favicon will update once the component hydrates on the client.
+```jsx
+drawOnFavicon(drawSquare, { fillColor: "black", length: 50, x: 200, y: 200 });
+```
 
-This means you can use `useFavicon` in any React framework without worrying about SSR errors.
+All options have sensible defaults — you can call `drawOnFavicon(drawCircle)` with no options for a red dot in the bottom-right corner.
 
-## Draw functions
+### Set an emoji favicon
 
-Draw functions take three parameters: a `context` object, `faviconSize`, and a `props` object.
+`emojiSvg` is a standalone helper — works with the hook or with React 19's `<link>`:
 
-Three simple canvas draw functions are included: `drawCircle`, `drawSquare`, and `drawTextBubble`,
+```jsx
+setFaviconHref(`data:image/svg+xml,${emojiSvg("🔥")}`);
+
+// or without the hook:
+<link rel="icon" href={`data:image/svg+xml,${emojiSvg("🔥")}`} />
+```
+
+### Set a favicon URL
+
+```jsx
+setFaviconHref("/favicons/active.png");
+```
+
+### Render JSX SVG as favicon
+
+```jsx
+await svgToFavicon(
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="50" fill="tomato" />
+  </svg>
+);
+```
+
+This dynamically imports `react-dom/server` to render the SVG to a string. Only `<svg>` elements are accepted.
+
+### Restore the original favicon
+
+```jsx
+restoreFavicon();
+```
+
+Resets the favicon to whatever it was when the hook first mounted.
+
+## SSR
+
+The hook is SSR-safe — it no-ops on the server and updates the favicon after hydration. In Next.js App Router, mark the component with `'use client'`.
 
 ## Credits & Inspiration
 
@@ -159,9 +156,6 @@ Three simple canvas draw functions are included: `drawCircle`, `drawSquare`, and
 - [Tinycon](https://github.com/tommoor/tinycon/blob/master/tinycon.js)
 - [react-favicon](https://github.com/oflisback/react-favicon)
 
-## Ideas & Loose Ends
+## Ideas
 
-- Option to draw on the original favicon, not just the latest
-- Not sure if the querySelector always works. What if there are multiple `<link rel="icon">` tags?
-- [Dark mode for SVG favicon swith `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
-- Tests with jest
+- [Dark mode for SVG favicon with `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)

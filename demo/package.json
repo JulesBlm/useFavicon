@@ -1,8 +1,7 @@
 {
   "name": "usefavicon-demo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Demo for useFavicon React hook",
   "homepage": "/usefavicon",
   "keywords": [
     "react-hook",
@@ -12,23 +11,22 @@
   "author": "Jules Blom",
   "license": "ISC",
   "scripts": {
-    "clean": "rm dist/bundle.js",
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html --public-url /usefavicon"
   },
-  "files": [
-    "src",
-    "dist"
-  ],
+  "alias": {
+    "react": "./node_modules/react",
+    "react-dom": "./node_modules/react-dom"
+  },
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-react": "^7.12.10",
-    "parcel-bundler": "^1.12.5",
-    "prettier": "^2.2.1"
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "parcel": "^2.16.4",
+    "parcel-reporter-static-files-copy": "^1.5.3",
+    "typescript": "^6.0.2"
   }
 }

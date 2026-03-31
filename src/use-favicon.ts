@@ -1,4 +1,5 @@
-import * as React from "react";
+import { useCallback, useEffect, useRef } from "react";
+import type { ReactSVGElement } from "react";
 
 const createCanvas = (faviconSize: number) => {
   const canvas = document.createElement("canvas");
@@ -8,7 +9,11 @@ const createCanvas = (faviconSize: number) => {
   return canvas;
 };
 
-export type DrawCallback = (context: CanvasRenderingContext2D, faviconSize: number, options: Record<PropertyKey, unknown>) => void;
+export type DrawCallback<T extends Record<string, unknown> = Record<string, unknown>> = (
+  context: CanvasRenderingContext2D,
+  faviconSize: number,
+  options: T,
+) => void;
 
 export interface DrawOptions {
   faviconSize?: number;
@@ -17,16 +22,15 @@ export interface DrawOptions {
 }
 
 export interface UseFaviconHandlers {
-  jsxToFavicon: (SvgEl: React.ReactSVGElement) => Promise<void>;
+  svgToFavicon: (SvgEl: ReactSVGElement) => Promise<void>;
   restoreFavicon: () => void;
-  drawOnFavicon: (drawCallback: DrawCallback, options?: DrawOptions) => void;
-  setFaviconHref: React.Dispatch<React.SetStateAction<string>>;
-  setEmojiFavicon: (emoji: string) => void;
+  drawOnFavicon: (drawCallback: DrawCallback, options?: DrawOptions) => Promise<void>;
+  setFaviconHref: (href: string) => void;
 }
 
-export type UseFaviconReturn = readonly [string, UseFaviconHandlers];
+export type UseFaviconReturn = UseFaviconHandlers;
 
-const svgFaviconTemplate = (emoji: string) =>
+export const emojiSvg = (emoji: string) =>
   `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
 <text y=%22.9em%22 font-size=%2290%22>
 ${emoji}
@@ -43,12 +47,12 @@ const findOrCreateFaviconLink = (): HTMLLinkElement => {
   const iconSelectors = [
     "link[rel='icon']",
     "link[rel='shortcut icon']",
-    "link[rel~='icon']"  // Matches any rel containing 'icon'
+    "link[rel~='icon']", // Matches any rel containing 'icon'
   ];
 
   for (const selector of iconSelectors) {
     const existingLink = document.querySelector<HTMLLinkElement>(selector);
-    if (existingLink && !existingLink.rel.includes('apple')) {
+    if (existingLink && !existingLink.rel.includes("apple")) {
       return existingLink;
     }
   }
@@ -56,157 +60,82 @@ const findOrCreateFaviconLink = (): HTMLLinkElement => {
   // No suitable favicon found, create a new one
   const newLink = document.createElement("link");
   newLink.rel = "icon";
-  newLink.type = "image/x-icon";
   document.head.appendChild(newLink);
 
   return newLink;
 };
 
 function useFavicon(): UseFaviconReturn {
-  const [faviconHref, setFaviconHref] = React.useState<string>("");
-  const faviconTagRef = React.useRef<HTMLLinkElement | null>(null);
-  const [originalHref, setOriginalHref] = React.useState<string>("");
-  const pendingDrawRef = React.useRef<HTMLImageElement | null>(null);
+  const faviconTagRef = useRef<HTMLLinkElement | null>(null);
+  const originalHrefRef = useRef<string>("");
+  const faviconHrefRef = useRef<string>("");
 
-  // Grab initial favicon on mount
-  React.useEffect(() => {
-    // SSR-safe: only run in browser environment
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return;
+  const setHref = useCallback((href: string) => {
+    faviconHrefRef.current = href;
+    if (faviconTagRef.current) {
+      faviconTagRef.current.href = href;
     }
+  }, []);
 
+  useEffect(function grabInitialFavicon() {
     const linkEl = findOrCreateFaviconLink();
     faviconTagRef.current = linkEl;
 
-    setFaviconHref(linkEl.href || "");
-    setOriginalHref(linkEl.href || "");
+    const href = linkEl.href || "";
+    faviconHrefRef.current = href;
+    originalHrefRef.current = href;
   }, []);
 
-  React.useEffect(() => {
-    // SSR-safe: only run in browser environment
-    if (typeof window === 'undefined' || typeof document === 'undefined' || !faviconTagRef.current) {
-      return;
-    }
-    faviconTagRef.current.setAttribute("href", faviconHref);
-  }, [faviconHref]);
+  const setFaviconHref = setHref;
 
-  // Clean up any pending draw operations on unmount
-  React.useEffect(() => {
-    return () => {
-      if (pendingDrawRef.current) {
-        pendingDrawRef.current.onload = null;
-        pendingDrawRef.current.onerror = null;
-        pendingDrawRef.current = null;
-      }
-    };
-  }, []);
+  const restoreFavicon = useCallback(
+    () => setHref(originalHrefRef.current),
+    [setHref],
+  );
 
-  const restoreFavicon = React.useCallback((): void => {
-    setFaviconHref(originalHref);
-  }, [originalHref]);
+  const svgToFavicon = useCallback(
+    async (SvgEl: ReactSVGElement) => {
+      if (SvgEl.type !== "svg")
+        throw Error("React element for 'svgToFavicon' must be of type 'svg'");
 
-  const jsxToFavicon = React.useCallback(async (SvgEl: React.ReactSVGElement): Promise<void> => {
-    if (SvgEl.type !== "svg")
-      throw Error("React element for 'jsxToFavicon' must of type 'svg'");
-
-    try {
       // Dynamic import to avoid bundling react-dom/server unless this function is used
       const { renderToStaticMarkup } = await import("react-dom/server");
       const renderedToString = renderToStaticMarkup(SvgEl);
       const encoded = encodeURIComponent(renderedToString);
       const replacedHashes = encoded.replace(/#/g, "%23");
 
-      setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
-    } catch (error) {
-      console.error("Failed to render JSX to favicon:", error);
-      throw error;
-    }
-  }, []);
+      setHref(`data:image/svg+xml,${replacedHashes}`);
+    },
+    [setHref],
+  );
 
-  const setEmojiFavicon = React.useCallback((emoji: string): void => {
-    setFaviconHref(`data:image/svg+xml,${svgFaviconTemplate(emoji)}`);
-  }, []);
-
-  const drawOnFavicon = React.useCallback(
-    (
+  const drawOnFavicon = useCallback(
+    async (
       drawCallback: DrawCallback,
-      { faviconSize = 256, clear = false, ...options } = {}
-    ): void => {
-      // SSR-safe: only run in browser environment
-      if (typeof window === 'undefined' || typeof document === 'undefined') {
-        console.warn('drawOnFavicon is not available in server-side rendering environments');
-        return;
-      }
-
-      // Cancel any pending draw operation to prevent race conditions
-      if (pendingDrawRef.current) {
-        pendingDrawRef.current.onload = null;
-        pendingDrawRef.current.onerror = null;
-        pendingDrawRef.current = null;
-      }
+      { faviconSize = 256, clear = false, ...options }: DrawOptions = {},
+    ): Promise<void> => {
+      if (typeof document === "undefined") return;
 
       const canvas = createCanvas(faviconSize);
-
       const img = document.createElement("img");
-      img.setAttribute("src", faviconHref);
+      img.src = faviconHrefRef.current;
 
-      // Track this as the current pending operation
-      pendingDrawRef.current = img;
+      await img.decode();
 
-      const cleanup = () => {
-        // Only clean up if this is still the current pending operation
-        if (pendingDrawRef.current === img) {
-          pendingDrawRef.current = null;
-        }
-        img.onload = null;
-        img.onerror = null;
-      };
+      const context = canvas.getContext("2d");
+      if (!context) return;
 
-      // The load event fires when a given resource has loaded, so when the <img> src attribute has changed
-      img.onload = () => {
-        const context = canvas.getContext("2d");
+      if (!clear) {
+        context.drawImage(img, 0, 0, faviconSize, faviconSize);
+      }
+      drawCallback(context, faviconSize, options);
 
-        if (!context) {
-          console.warn("Could not create drawing context for favicon");
-          cleanup();
-          return;
-        }
-
-        if (!clear) context.drawImage(img, 0, 0, faviconSize, faviconSize); // Draw current favicon as background
-
-        drawCallback(context, faviconSize, options);
-
-        const pngURI = canvas.toDataURL("image/png");
-        setFaviconHref(pngURI);
-        cleanup();
-      };
-
-      img.onerror = () => {
-        console.warn("Failed to load favicon image for drawing");
-        cleanup();
-      };
+      setHref(canvas.toDataURL("image/png"));
     },
-    [faviconHref]
+    [setHref],
   );
 
-  const handlers = React.useMemo(
-    () => ({
-      jsxToFavicon,
-      restoreFavicon,
-      drawOnFavicon,
-      setFaviconHref,
-      setEmojiFavicon,
-    }),
-    [
-      jsxToFavicon,
-      restoreFavicon,
-      drawOnFavicon,
-      setFaviconHref,
-      setEmojiFavicon,
-    ]
-  );
-
-  return [faviconHref, handlers] as const;
+  return { drawOnFavicon, restoreFavicon, setFaviconHref, svgToFavicon };
 }
 
 export { useFavicon };

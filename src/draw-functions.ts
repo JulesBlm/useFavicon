@@ -1,4 +1,4 @@
-interface DrawCircleOptions {
+export interface DrawCircleOptions {
   fillColor: string;
   radius: number;
   x: number;
@@ -30,7 +30,7 @@ export const drawCircle = (
   context.fill();
 };
 
-interface DrawSquareOptions {
+export interface DrawSquareOptions {
   fillColor: string;
   length: number;
   x: number;
@@ -60,7 +60,7 @@ export const drawSquare = (
   context.fill();
 };
 
-interface DrawTextBubbleOptions {
+export interface DrawTextBubbleOptions {
   label: string;
   color: string;
   fontSize: number;

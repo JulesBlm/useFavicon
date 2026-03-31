@@ -1,14 +1,10 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import {
-  drawTextBubble,
-  drawCircle,
-  drawSquare,
-  useFavicon,
-} from "./usefavicon.modern";
+import React, { useEffect, useState } from "react";
+import { useFavicon, emojiSvg } from "../../src/use-favicon";
+import { drawTextBubble, drawCircle, drawSquare } from "../../src/draw-functions";
+import type { UseFaviconReturn } from "../../src/use-favicon";
 import "./App.css";
 
-const TextDemoItem = ({ drawOnFavicon }) => {
+const TextDemoItem = ({ drawOnFavicon }: { drawOnFavicon: UseFaviconReturn["drawOnFavicon"] }) => {
   const [input, setInput] = useState("5");
 
   return (
@@ -25,8 +21,8 @@ const TextDemoItem = ({ drawOnFavicon }) => {
             onChange={({ target }) => setInput(target.value)}
             value={input}
             type="text"
-            maxLength="4"
-            size="4"
+            maxLength={4}
+            size={4}
           />
         </div>
       </div>
@@ -63,48 +59,38 @@ const demoSvg = (
 );
 
 const someEmojis = [
-  "😎",
-  "👹",
-  "👻",
-  "👔",
-  "🎒",
-  "🧀",
-  "❤️",
-  "💯",
-  "⚛️",
-  "🌇",
-  "🏞",
-  "🌅",
-  "🏙",
-  "⚽️",
-  "🦦",
-  "🦥",
-  "🦧",
-  "🐳",
-  "🍆",
-  "🍔",
-  "🚥",
-  "📱",
-  "💈",
-  "💶",
-  "🍿",
-  "🌚",
-  "🌝",
-  "🌞",
-  "🙉",
-  "🐼",
+  "😎", "👹", "👻", "👔", "🎒", "🧀", "❤️", "💯", "⚛️", "🌇",
+  "🏞", "🌅", "🏙", "⚽️", "🦦", "🦥", "🦧", "🐳", "🍆", "🍔",
+  "🚥", "📱", "💈", "💶", "🍿", "🌚", "🌝", "🌞", "🙉", "🐼",
 ];
 
-function App() {
-  const [faviconHref, setters] = useFavicon();
+function useFaviconPreview() {
+  const [previewHref, setPreviewHref] = useState("");
 
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+    if (!link) return;
+    setPreviewHref(link.href);
+
+    const observer = new MutationObserver(() => {
+      setPreviewHref(link.href);
+    });
+    observer.observe(link, { attributes: true, attributeFilter: ["href"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return previewHref;
+}
+
+function App() {
   const {
     setFaviconHref,
     restoreFavicon,
     drawOnFavicon,
-    setEmojiFavicon,
-    jsxToFavicon,
-  } = setters;
+    svgToFavicon,
+  } = useFavicon();
+
+  const previewHref = useFaviconPreview();
 
   const randomEmoji = () =>
     someEmojis[Math.floor(Math.random() * someEmojis.length)];
@@ -132,17 +118,18 @@ function App() {
             </svg>
           </a>
         </h1>
-        <img
-          src={faviconHref}
-          width="150px"
-          height="150px"
-          alt="This is a big copy of your favicon for demo purposes"
-          title="This is a big copy of your favicon for demo purposes"
-        />
+        {previewHref && (
+          <img
+            src={previewHref}
+            width="150px"
+            height="150px"
+            alt="Current favicon preview"
+          />
+        )}
         <h2>
           Push some of these buttons and look at your favicon
           <span role="img" aria-label="Finger pointing up">
-            ☝️
+            {" "}☝️
           </span>
         </h2>
       </header>
@@ -195,7 +182,7 @@ function App() {
             </div>
             <div className="Demo-Item">
               <p>
-                Draw a rectangle on top of the favicon in a custom postion and
+                Draw a rectangle on top of the favicon in a custom position and
                 color
               </p>
               <button
@@ -257,7 +244,7 @@ function App() {
             <div className="Demo-Item">
               <p>
                 Construct a React SVG element with <abbr>JSX</abbr> and pass
-                that to <code>jsxToFavicon()</code>, note{" "}
+                that to <code>svgToFavicon()</code>, note{" "}
                 <mark>
                   only React elements of type <code>svg</code>
                 </mark>{" "}
@@ -284,19 +271,19 @@ function App() {
   />
 </svg>)
 
-// from JSX to Favicon!🪄,
-jsxToFavicon(faviconSvgEl)
+// from JSX to Favicon!
+svgToFavicon(faviconSvgEl)
 `}
                 </code>
               </pre>
-              <button className="Button" onClick={() => jsxToFavicon(demoSvg)}>
+              <button className="Button" onClick={() => svgToFavicon(demoSvg)}>
                 Set favicon with JSX
               </button>
             </div>
 
             <div className="Demo-Item">
               <p>
-                Set an emoji as the favicon with <code>setEmojiFavicon()</code>,
+                Set an emoji as the favicon with <code>emojiSvg()</code> and <code>setFaviconHref()</code>,
                 credits to{" "}
                 <a href="https://twitter.com/LeaVerou/status/1241619866475474946?s=20">
                   Lea Verou
@@ -309,12 +296,11 @@ jsxToFavicon(faviconSvgEl)
                 >
                   Chris Coyier
                 </a>
-                . Note that you can use any character not just emoji's, just
-                know that they don&apos;t work as well as emoji&apos;s.
+                .
               </p>
               <button
                 className="Button"
-                onClick={() => setEmojiFavicon(randomEmoji())}
+                onClick={() => setFaviconHref(`data:image/svg+xml,${emojiSvg(randomEmoji())}`)}
               >
                 Set emoji favicon
               </button>
@@ -326,24 +312,19 @@ jsxToFavicon(faviconSvgEl)
           <h2>Usage</h2>
           <pre className="code-block">
             <code>
-              {`
-import { useFavicon } from "./use-favicon";
-import { drawCircle, drawSquare, drawTextBubble } from "./drawFunctions";
+              {`import { useFavicon, emojiSvg } from "react-usefavicon";
+import { drawCircle, drawSquare, drawTextBubble } from "react-usefavicon";
 
 function App() {
+  const {
+    restoreFavicon,
+    drawOnFavicon,
+    setFaviconHref,
+    svgToFavicon,
+  } = useFavicon();
 
-  const [
-    faviconHref,
-    { 
-      restoreFavicon,
-      drawOnFavicon,
-      setEmojiFavicon,
-      setFaviconHref
-    }
-  ] = useFavicon();
-  
-  ...
-  `}
+  // ...
+}`}
             </code>
           </pre>
         </section>
