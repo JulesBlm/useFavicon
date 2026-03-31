@@ -1,4 +1,4 @@
-interface DrawCircleOptions {
+export interface DrawCircleOptions {
   fillColor: string;
   radius: number;
   x: number;
@@ -9,7 +9,7 @@ export const drawCircle = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: DrawCircleOptions
-) => {
+): void => {
   const {
     fillColor = "red",
     radius = faviconSize / 5,
@@ -30,7 +30,7 @@ export const drawCircle = (
   context.fill();
 };
 
-interface DrawSquareOptions {
+export interface DrawSquareOptions {
   fillColor: string;
   length: number;
   x: number;
@@ -41,7 +41,7 @@ export const drawSquare = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: DrawSquareOptions
-) => {
+): void => {
   const {
     fillColor = "black",
     length = faviconSize / 5,
@@ -60,19 +60,28 @@ export const drawSquare = (
   context.fill();
 };
 
-interface DrawTextBubbleOptions {
+export interface DrawTextBubbleOptions {
   label: string;
   color: string;
   fontSize: number;
   font: string;
 }
 
+// Constants for bubble positioning and sizing
+const BUBBLE_BASE_WIDTH_RATIO = 1 / 3; // 33% of favicon size
+const BUBBLE_HEIGHT_RATIO = 2 / 3; // 66% of favicon size (1/1.5)
+const BUBBLE_CORNER_RADIUS_RATIO = 1 / 8; // 12.5% of favicon size
+const BUBBLE_EXTRA_WIDTH_PER_CHAR = 1 / 5; // 20% of favicon size per character
+const BUBBLE_TEXT_OFFSET_X_RATIO = 1 / 4.75; // Horizontal text positioning
+const BUBBLE_TEXT_EXTRA_WIDTH_OFFSET = 1 / 4; // Extra offset for multi-char labels
+const BUBBLE_TEXT_OFFSET_Y_RATIO = 1 / 8; // Vertical text positioning from bottom
+
 // adapted from https://github.com/tommoor/tinycon/blob/master/tinycon.js#L167
 export const drawTextBubble = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: Partial<DrawTextBubbleOptions>
-) => {
+): void => {
   const {
     label = "",
     color = "orangered",
@@ -80,23 +89,25 @@ export const drawTextBubble = (
     font = "sans-serif",
   } = options;
 
-  // these numbers are pure trial and error I should have thought about them more it works ok though
-  // bubble needs to be wider for double digits, 4 digits max now
-  const extraWidth = (label.length * faviconSize) / 5;
+  // Calculate bubble dimensions
+  // Bubble needs to be wider for multiple digits (supports up to 4 digits)
+  const extraWidth = label.length * faviconSize * BUBBLE_EXTRA_WIDTH_PER_CHAR;
+  const bubbleWidth = faviconSize * BUBBLE_BASE_WIDTH_RATIO + extraWidth;
+  const bubbleHeight = faviconSize * BUBBLE_HEIGHT_RATIO;
 
-  const bubbleWidth = faviconSize / 3 + extraWidth;
-  const bubbleHeight = faviconSize / 1.5; // 2/3
+  // Calculate bubble position (bottom-right corner)
+  const top = faviconSize - bubbleHeight;
+  const left = faviconSize - bubbleWidth;
+  const bottom = faviconSize;
+  const right = faviconSize;
+  const radius = faviconSize * BUBBLE_CORNER_RADIUS_RATIO;
 
-  const top = faviconSize - bubbleHeight,
-    left = faviconSize - bubbleWidth,
-    bottom = faviconSize,
-    right = faviconSize,
-    radius = faviconSize / 8,
-    textX =
-      label.length > 1
-        ? faviconSize - bubbleWidth / 4.75 + extraWidth / 4
-        : faviconSize - bubbleWidth / 4.75,
-    textY = faviconSize - bubbleHeight / 8;
+  // Calculate text position
+  const baseTextX = faviconSize - bubbleWidth * BUBBLE_TEXT_OFFSET_X_RATIO;
+  const textX = label.length > 1
+    ? baseTextX + extraWidth * BUBBLE_TEXT_EXTRA_WIDTH_OFFSET
+    : baseTextX;
+  const textY = faviconSize - bubbleHeight * BUBBLE_TEXT_OFFSET_Y_RATIO;
 
   context.fillStyle = color;
   context.lineWidth = 12;

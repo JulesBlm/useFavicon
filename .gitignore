@@ -12,6 +12,7 @@ demo/node_modules
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -22,7 +23,7 @@ demo/node_modules
 /klad
 
 demo/dist
-demo/.cache
+demo/.parcel-cache
 
 npm-debug.log*
 yarn-debug.log*
