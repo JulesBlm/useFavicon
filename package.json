@@ -10,18 +10,15 @@
     "url": "https://github.com/JulesBlm/useFavicon.git"
   },
   "sideEffects": false,
-  "main": "./dist/react-usefavicon.js",
-  "browser": "./dist/react-usefavicon.umd.js",
-  "umd:main": "./dist/react-usefavicon.umd.js",
-  "module": "./dist/react-usefavicon.module.js",
-  "source": "./src/index.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/react-usefavicon.modern.mjs",
-      "require": "./dist/react-usefavicon.js",
-      "default": "./dist/react-usefavicon.modern.mjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -44,9 +41,7 @@
     "url": "https://github.com/sponsors/JulesBlm"
   },
   "scripts": {
-    "build": "rimraf dist && npm run test && npm run build:react",
-    "build:react": "microbundle --define process.env.NODE_ENV=production --name usefavicon --no-compress --output dist/",
-    "build:ci": "microbundle --define process.env.NODE_ENV=production --name usefavicon --output dist/",
+    "build": "npm run test && tsup",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
@@ -83,12 +78,11 @@
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "jsdom": "^25.0.0",
-    "microbundle": "^0.15.1",
     "prettier": "^3.4.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "rimraf": "^6.0.0",
-    "typescript": "^6.0.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.2"
   },
   "peerDependencies": {
