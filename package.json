@@ -16,6 +16,15 @@
   "module": "./dist/react-usefavicon.module.js",
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/react-usefavicon.modern.mjs",
+      "require": "./dist/react-usefavicon.js",
+      "default": "./dist/react-usefavicon.modern.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "license": "MIT",
   "keywords": [
     "favicon",
