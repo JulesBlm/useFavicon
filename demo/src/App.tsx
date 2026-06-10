@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import { useFavicon, emojiSvg } from "../../src/use-favicon";
 import { drawTextBubble, drawCircle, drawSquare } from "../../src/draw-functions";
 import type { UseFaviconReturn } from "../../src/use-favicon";
@@ -64,22 +64,22 @@ const someEmojis = [
   "🚥", "📱", "💈", "💶", "🍿", "🌚", "🌝", "🌞", "🙉", "🐼",
 ];
 
+const getFaviconHref = () =>
+  document.querySelector<HTMLLinkElement>("link[rel='icon']")?.href ?? "";
+
 function useFaviconPreview() {
-  const [previewHref, setPreviewHref] = useState("");
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+      if (!link) return () => {};
 
-  useEffect(() => {
-    const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
-    if (!link) return;
-    setPreviewHref(link.href);
-
-    const observer = new MutationObserver(() => {
-      setPreviewHref(link.href);
-    });
-    observer.observe(link, { attributes: true, attributeFilter: ["href"] });
-    return () => observer.disconnect();
-  }, []);
-
-  return previewHref;
+      const observer = new MutationObserver(onStoreChange);
+      observer.observe(link, { attributes: true, attributeFilter: ["href"] });
+      return () => observer.disconnect();
+    },
+    getFaviconHref,
+    () => "",
+  );
 }
 
 function App() {

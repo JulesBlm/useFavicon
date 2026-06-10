@@ -42,7 +42,7 @@
   },
   "scripts": {
     "build": "npm run test && tsup",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint .",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
@@ -58,31 +58,26 @@
       "last 1 safari version"
     ]
   },
-  "eslintIgnore": [
-    "node_modules",
-    "dist"
-  ],
   "prettier": {
     "trailingComma": "all",
     "semi": true
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.18.0",
-    "@typescript-eslint/parser": "^8.18.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.37.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^25.0.0",
     "prettier": "^3.4.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0",
     "vitest": "^4.1.2"
   },
   "peerDependencies": {
