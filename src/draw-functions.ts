@@ -1,8 +1,8 @@
 export interface DrawCircleOptions {
-  fillColor: string;
-  radius: number;
-  x: number;
-  y: number;
+  fillColor?: string;
+  radius?: number;
+  x?: number;
+  y?: number;
 }
 
 export const drawCircle = (
@@ -15,7 +15,6 @@ export const drawCircle = (
     radius = faviconSize / 5,
     x = faviconSize - faviconSize / 5,
     y = faviconSize - faviconSize / 5,
-    
   } = options;
 
   context.beginPath();
@@ -31,10 +30,10 @@ export const drawCircle = (
 };
 
 export interface DrawSquareOptions {
-  fillColor: string;
-  length: number;
-  x: number;
-  y: number;
+  fillColor?: string;
+  length?: number;
+  x?: number;
+  y?: number;
 }
 
 export const drawSquare = (
@@ -49,22 +48,15 @@ export const drawSquare = (
     y = faviconSize - faviconSize / 5,
   } = options;
 
-  context.beginPath();
   context.fillStyle = fillColor;
-  context.fillRect(
-    x,
-    y,
-    length, 
-    length 
-  );
-  context.fill();
+  context.fillRect(x, y, length, length);
 };
 
 export interface DrawTextBubbleOptions {
-  label: string;
-  color: string;
-  fontSize: number;
-  font: string;
+  label?: string;
+  color?: string;
+  fontSize?: number;
+  font?: string;
 }
 
 // Constants for bubble positioning and sizing
@@ -80,7 +72,7 @@ const BUBBLE_TEXT_OFFSET_Y_RATIO = 1 / 8; // Vertical text positioning from bott
 export const drawTextBubble = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
-  options: Partial<DrawTextBubbleOptions>
+  options: DrawTextBubbleOptions
 ): void => {
   const {
     label = "",
