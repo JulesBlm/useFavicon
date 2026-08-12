@@ -140,7 +140,9 @@ This dynamically imports `react-dom/server` to render the SVG to a string. Only 
 restoreFavicon();
 ```
 
-Resets the favicon to whatever it was when the hook first mounted.
+Resets the favicon to its original href.
+
+**What counts as "original":** the favicon's href as it was when the hook *first* touched the favicon — this baseline is shared by all `useFavicon()` instances on the page, so a component that mounts after another component has already drawn on the favicon still restores the true original, not the drawn-on version. If your framework replaces the favicon `<link>` element itself (for example on a route change to a page that defines its own favicon), the hook adopts the new element's href as the new original.
 
 ## SSR
 

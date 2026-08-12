@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import type { ReactSVGElement } from "react";
 
 const createCanvas = (faviconSize: number) => {
@@ -9,7 +9,7 @@ const createCanvas = (faviconSize: number) => {
   return canvas;
 };
 
-export type DrawCallback<T extends Record<string, unknown> = Record<string, unknown>> = (
+export type DrawCallback<T extends object = Record<string, unknown>> = (
   context: CanvasRenderingContext2D,
   faviconSize: number,
   options: T,
@@ -24,7 +24,10 @@ export interface DrawOptions {
 export interface UseFaviconHandlers {
   svgToFavicon: (SvgEl: ReactSVGElement) => Promise<void>;
   restoreFavicon: () => void;
-  drawOnFavicon: (drawCallback: DrawCallback, options?: DrawOptions) => Promise<void>;
+  drawOnFavicon: <T extends object = Record<string, unknown>>(
+    drawCallback: DrawCallback<T>,
+    options?: DrawOptions & T,
+  ) => Promise<void>;
   setFaviconHref: (href: string) => void;
 }
 
@@ -65,33 +68,38 @@ const findOrCreateFaviconLink = (): HTMLLinkElement => {
   return newLink;
 };
 
+// Shared across all hook instances: there is only one favicon per document,
+// so keeping this state per-instance lets a second instance capture an
+// already-modified favicon as its "original" and restore the wrong thing.
+let faviconLink: HTMLLinkElement | null = null;
+let originalHref = "";
+
+const getFaviconLink = (): HTMLLinkElement => {
+  // Re-find the link if the framework replaced it (e.g. on a route change);
+  // the new link's href then becomes the new original.
+  if (!faviconLink || !faviconLink.isConnected) {
+    faviconLink = findOrCreateFaviconLink();
+    originalHref = faviconLink.href || "";
+  }
+
+  return faviconLink;
+};
+
 function useFavicon(): UseFaviconReturn {
-  const faviconTagRef = useRef<HTMLLinkElement | null>(null);
-  const originalHrefRef = useRef<string>("");
-  const faviconHrefRef = useRef<string>("");
-
-  const setHref = useCallback((href: string) => {
-    faviconHrefRef.current = href;
-    if (faviconTagRef.current) {
-      faviconTagRef.current.href = href;
-    }
-  }, []);
-
   useEffect(function grabInitialFavicon() {
-    const linkEl = findOrCreateFaviconLink();
-    faviconTagRef.current = linkEl;
-
-    const href = linkEl.href || "";
-    faviconHrefRef.current = href;
-    originalHrefRef.current = href;
+    getFaviconLink();
   }, []);
 
-  const setFaviconHref = setHref;
+  const setFaviconHref = useCallback((href: string) => {
+    if (typeof document === "undefined") return;
+    getFaviconLink().href = href;
+  }, []);
 
-  const restoreFavicon = useCallback(
-    () => setHref(originalHrefRef.current),
-    [setHref],
-  );
+  const restoreFavicon = useCallback(() => {
+    if (typeof document === "undefined") return;
+    // Ensure the original href is captured before reading it
+    getFaviconLink().href = originalHref;
+  }, []);
 
   const svgToFavicon = useCallback(
     async (SvgEl: ReactSVGElement) => {
@@ -104,35 +112,50 @@ function useFavicon(): UseFaviconReturn {
       const encoded = encodeURIComponent(renderedToString);
       const replacedHashes = encoded.replace(/#/g, "%23");
 
-      setHref(`data:image/svg+xml,${replacedHashes}`);
+      setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
     },
-    [setHref],
+    [setFaviconHref],
   );
 
   const drawOnFavicon = useCallback(
-    async (
-      drawCallback: DrawCallback,
-      { faviconSize = 256, clear = false, ...options }: DrawOptions = {},
+    async <T extends object = Record<string, unknown>>(
+      drawCallback: DrawCallback<T>,
+      drawOptions?: DrawOptions & T,
     ): Promise<void> => {
       if (typeof document === "undefined") return;
 
+      const {
+        faviconSize = 256,
+        clear = false,
+        ...options
+      } = drawOptions ?? ({} as DrawOptions & T);
+
+      const link = getFaviconLink();
       const canvas = createCanvas(faviconSize);
-      const img = document.createElement("img");
-      img.src = faviconHrefRef.current;
-
-      await img.decode();
-
       const context = canvas.getContext("2d");
       if (!context) return;
 
-      if (!clear) {
-        context.drawImage(img, 0, 0, faviconSize, faviconSize);
-      }
-      drawCallback(context, faviconSize, options);
+      if (!clear && link.href) {
+        const img = document.createElement("img");
+        // Without this, a favicon served from another origin taints the
+        // canvas and toDataURL() throws a SecurityError
+        img.crossOrigin = "anonymous";
+        img.src = link.href;
 
-      setHref(canvas.toDataURL("image/png"));
+        try {
+          await img.decode();
+          context.drawImage(img, 0, 0, faviconSize, faviconSize);
+        } catch {
+          // The favicon failed to load (missing, blocked, or served without
+          // CORS headers); draw on a blank canvas instead of rejecting
+        }
+      }
+
+      drawCallback(context, faviconSize, options as T);
+
+      link.href = canvas.toDataURL("image/png");
     },
-    [setHref],
+    [],
   );
 
   return { drawOnFavicon, restoreFavicon, setFaviconHref, svgToFavicon };
