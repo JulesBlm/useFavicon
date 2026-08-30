@@ -197,5 +197,4 @@ Rule of thumb: render a `<link>` when the whole icon swaps between known URLs, a
 
 ## Ideas
 
-- [Dark mode for SVG favicon with `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
-- A declarative variant for React 19: a `useFaviconHref(drawCallback)` hook that returns a data-URI string you render yourself via `<link rel="icon" href={href} />`, so React owns the element end-to-end and nothing is mutated out-of-band
+Future directions — a declarative React 19 API, WebGL/WebGPU rendering, animation, dark-mode SVGs — live in [V4.md](V4.md).
