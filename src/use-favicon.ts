@@ -41,24 +41,28 @@ ${emoji}
 </svg>`.trim();
 
 /**
- * Finds the appropriate favicon link element or creates a new one.
- * Priority order: icon, shortcut icon, then creates a new one.
- * Ignores apple-touch-icon and other specialized favicons.
+ * Finds the favicon link the browser is actually displaying, or creates a
+ * new one. When a page has several icon links, browsers don't use the first
+ * in document order: SVG icons are preferred, and among equals the last
+ * link wins. Mutating any other link would be invisible.
  */
 const findOrCreateFaviconLink = (): HTMLLinkElement => {
-  // Try to find standard favicon link tags in priority order
-  const iconSelectors = [
-    "link[rel='icon']",
-    "link[rel='shortcut icon']",
-    "link[rel~='icon']", // Matches any rel containing 'icon'
-  ];
+  // rel~='icon' matches the "icon" rel token, covering rel="icon" and
+  // rel="shortcut icon" while excluding apple-touch-icon and mask-icon
+  // (whose rels are single tokens that merely contain "icon")
+  const candidates = document.querySelectorAll<HTMLLinkElement>(
+    "link[rel~='icon']",
+  );
 
-  for (const selector of iconSelectors) {
-    const existingLink = document.querySelector<HTMLLinkElement>(selector);
-    if (existingLink && !existingLink.rel.includes("apple")) {
-      return existingLink;
+  let chosen: HTMLLinkElement | null = null;
+  for (let i = 0; i < candidates.length; i++) {
+    const candidate = candidates[i];
+    const chosenIsSvg = chosen?.type === "image/svg+xml";
+    if (candidate.type === "image/svg+xml" || !chosenIsSvg) {
+      chosen = candidate;
     }
   }
+  if (chosen) return chosen;
 
   // No suitable favicon found, create a new one
   const newLink = document.createElement("link");

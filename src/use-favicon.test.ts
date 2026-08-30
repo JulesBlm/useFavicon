@@ -62,6 +62,84 @@ test("a second hook instance restores the original favicon, not an intermediate 
   expect(link.href).toBe("https://example.com/original.png");
 });
 
+test("prefers the SVG icon link when both .ico and SVG links exist", () => {
+  const icoLink = document.createElement("link");
+  icoLink.rel = "icon";
+  icoLink.href = "https://example.com/favicon.ico";
+  document.head.appendChild(icoLink);
+
+  const svgLink = document.createElement("link");
+  svgLink.rel = "icon";
+  svgLink.type = "image/svg+xml";
+  svgLink.href = "https://example.com/favicon.svg";
+  document.head.appendChild(svgLink);
+
+  const { result } = renderHook(() => useFavicon());
+  act(() => {
+    result.current.setFaviconHref("https://example.com/badge.png");
+  });
+
+  expect(svgLink.href).toBe("https://example.com/badge.png");
+  expect(icoLink.href).toBe("https://example.com/favicon.ico");
+});
+
+test("prefers an SVG icon link even when it comes before the .ico link", () => {
+  const svgLink = document.createElement("link");
+  svgLink.rel = "icon";
+  svgLink.type = "image/svg+xml";
+  svgLink.href = "https://example.com/favicon.svg";
+  document.head.appendChild(svgLink);
+
+  const icoLink = document.createElement("link");
+  icoLink.rel = "icon";
+  icoLink.href = "https://example.com/favicon.ico";
+  document.head.appendChild(icoLink);
+
+  const { result } = renderHook(() => useFavicon());
+  act(() => {
+    result.current.setFaviconHref("https://example.com/badge.png");
+  });
+
+  expect(svgLink.href).toBe("https://example.com/badge.png");
+  expect(icoLink.href).toBe("https://example.com/favicon.ico");
+});
+
+test("uses the last icon link when none are SVG-typed", () => {
+  const firstLink = document.createElement("link");
+  firstLink.rel = "shortcut icon";
+  firstLink.href = "https://example.com/legacy.ico";
+  document.head.appendChild(firstLink);
+
+  const lastLink = document.createElement("link");
+  lastLink.rel = "icon";
+  lastLink.href = "https://example.com/favicon.png";
+  document.head.appendChild(lastLink);
+
+  const { result } = renderHook(() => useFavicon());
+  act(() => {
+    result.current.setFaviconHref("https://example.com/badge.png");
+  });
+
+  expect(lastLink.href).toBe("https://example.com/badge.png");
+  expect(firstLink.href).toBe("https://example.com/legacy.ico");
+});
+
+test("ignores apple-touch-icon links", () => {
+  const appleLink = document.createElement("link");
+  appleLink.rel = "apple-touch-icon";
+  appleLink.href = "https://example.com/apple-touch-icon.png";
+  document.head.appendChild(appleLink);
+
+  const { result } = renderHook(() => useFavicon());
+  act(() => {
+    result.current.setFaviconHref("https://example.com/badge.png");
+  });
+
+  expect(appleLink.href).toBe("https://example.com/apple-touch-icon.png");
+  const created = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+  expect(created?.href).toBe("https://example.com/badge.png");
+});
+
 test("emojiSvg returns a data-uri-safe SVG string", () => {
   const result = emojiSvg("🔥");
 
