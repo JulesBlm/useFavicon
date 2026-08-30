@@ -1,5 +1,6 @@
 import { beforeEach, expect, test } from "vitest";
 import { act, renderHook } from "@testing-library/react";
+import { createElement } from "react";
 import useFavicon, { emojiSvg } from "./use-favicon";
 
 beforeEach(() => {
@@ -138,6 +139,42 @@ test("ignores apple-touch-icon links", () => {
   expect(appleLink.href).toBe("https://example.com/apple-touch-icon.png");
   const created = document.querySelector<HTMLLinkElement>("link[rel='icon']");
   expect(created?.href).toBe("https://example.com/badge.png");
+});
+
+test("svgToFavicon renders JSX SVG to a data-uri favicon with xmlns", async () => {
+  const link = document.createElement("link");
+  link.rel = "icon";
+  link.href = "https://example.com/original.png";
+  document.head.appendChild(link);
+
+  const { result } = renderHook(() => useFavicon());
+
+  await act(async () => {
+    // No xmlns in the JSX: the serializer must add it for the data URI to work
+    await result.current.svgToFavicon(
+      createElement(
+        "svg",
+        { viewBox: "0 0 100 100" },
+        createElement("circle", { cx: 50, cy: 50, r: 50, fill: "tomato" }),
+      ),
+    );
+  });
+
+  expect(link.href).toMatch(/^data:image\/svg\+xml,/);
+  const markup = decodeURIComponent(
+    link.href.slice("data:image/svg+xml,".length),
+  );
+  expect(markup).toContain('xmlns="http://www.w3.org/2000/svg"');
+  expect(markup).toContain("<circle");
+});
+
+test("svgToFavicon rejects non-svg elements", async () => {
+  const { result } = renderHook(() => useFavicon());
+
+  await expect(
+    // @ts-expect-error deliberately passing a non-svg element
+    result.current.svgToFavicon(createElement("div")),
+  ).rejects.toThrow("must be of type 'svg'");
 });
 
 test("emojiSvg returns a data-uri-safe SVG string", () => {

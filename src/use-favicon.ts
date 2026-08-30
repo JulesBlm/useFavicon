@@ -110,13 +110,29 @@ function useFavicon(): UseFaviconReturn {
       if (SvgEl.type !== "svg")
         throw Error("React element for 'svgToFavicon' must be of type 'svg'");
 
-      // Dynamic import to avoid bundling react-dom/server unless this function is used
-      const { renderToStaticMarkup } = await import("react-dom/server");
-      const renderedToString = renderToStaticMarkup(SvgEl);
-      const encoded = encodeURIComponent(renderedToString);
-      const replacedHashes = encoded.replace(/#/g, "%23");
+      // Render with react-dom/client, which is already in every consumer's
+      // bundle, rather than pulling the react-dom/server renderer into the
+      // client. Dynamic imports keep react-dom out of the module graph for
+      // consumers who never call this function.
+      const [{ createRoot }, { flushSync }] = await Promise.all([
+        import("react-dom/client"),
+        import("react-dom"),
+      ]);
 
-      setFaviconHref(`data:image/svg+xml,${replacedHashes}`);
+      const container = document.createElement("div");
+      const root = createRoot(container);
+      try {
+        flushSync(() => root.render(SvgEl));
+        const svgNode = container.firstElementChild;
+        if (!svgNode) throw Error("Failed to render SVG element");
+
+        // XMLSerializer emits the SVG namespace even when the JSX omits
+        // xmlns, which a data: URI favicon requires
+        const markup = new XMLSerializer().serializeToString(svgNode);
+        setFaviconHref(`data:image/svg+xml,${encodeURIComponent(markup)}`);
+      } finally {
+        root.unmount();
+      }
     },
     [setFaviconHref],
   );
