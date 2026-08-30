@@ -55,6 +55,7 @@ export const drawSquare = (
 export interface DrawTextBubbleOptions {
   label?: string;
   color?: string;
+  textColor?: string;
   fontSize?: number;
   font?: string;
 }
@@ -77,6 +78,7 @@ export const drawTextBubble = (
   const {
     label = "",
     color = "orangered",
+    textColor = "white",
     fontSize = faviconSize / 2,
     font = "sans-serif",
   } = options;
@@ -125,12 +127,10 @@ export const drawTextBubble = (
   context.stroke();
 
   // label
-  context.fillStyle = "white";
+  context.fillStyle = textColor;
   context.textAlign = "right";
   context.textBaseline = "bottom";
   context.lineWidth = faviconSize / 16;
-
-  context.fillStyle = "white";
   context.font = `${fontSize}px ${font}`;
 
   context.fillText(label, textX, textY);

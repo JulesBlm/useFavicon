@@ -106,7 +106,7 @@ drawOnFavicon(drawCircle, { fillColor: "red", radius: 40, x: 200, y: 200 });
 **`drawTextBubble`** — draws a rounded badge with a text label (unread count)
 
 ```jsx
-drawOnFavicon(drawTextBubble, { label: "3", color: "orangered", fontSize: 128, font: "sans-serif" });
+drawOnFavicon(drawTextBubble, { label: "3", color: "orangered", textColor: "white", fontSize: 128, font: "sans-serif" });
 ```
 
 **`drawSquare`** — draws a filled square
