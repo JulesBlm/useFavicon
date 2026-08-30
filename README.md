@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/react-usefavicon.svg)](https://www.npmjs.com/package/react-usefavicon)
 
-[Check a live demo here](https://jules.engineer/usefavicon/)
+[Check a live demo here](https://julesblom.com/libraries/usefavicon)
 
 react-usefavicon is a React hook to dynamically draw on your favicon. Composite badges, text bubbles, progress indicators, or anything you can draw on a canvas onto your existing favicon. This is useful to notify the user of changes or progress, especially if these are long running and the user is expected to switch tabs. GitHub ([read more](https://joelcalifa.com/blog/tiny-wins/)), Slack, and many more websites use this technique.
 

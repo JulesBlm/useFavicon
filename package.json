@@ -3,7 +3,7 @@
   "description": "useFavicon: a React Hook to dynamically modify the favicon",
   "author": "Jules Blom (https://twitter.com/Mega_Jules)",
   "private": false,
-  "homepage": "https://jules.engineer/usefavicon",
+  "homepage": "https://julesblom.com/libraries/usefavicon",
   "version": "3.0.0",
   "repository": {
     "type": "git",
