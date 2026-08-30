@@ -12,17 +12,13 @@ react-usefavicon is a React hook to dynamically draw on your favicon. Composite 
 
 ## Installing
 
-If you use npm
+Requires React 18 or newer.
 
 ```bash
 npm install react-usefavicon
 ```
 
-For yarn
-
-```bash
-yarn add react-usefavicon
-```
+(or `yarn add` / `pnpm add`)
 
 ## Usage
 
@@ -39,16 +35,17 @@ Returns an object of stable handler functions.
 Draw anything on top of the current favicon using the [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D). The current favicon is drawn as the background first, then your callback runs on top.
 
 ```jsx
-import { useFavicon, drawCircle, drawTextBubble } from "react-usefavicon";
+import { useEffect } from "react";
+import { useFavicon, drawTextBubble } from "react-usefavicon";
 
 function Notifications({ count }) {
   const { drawOnFavicon, restoreFavicon } = useFavicon();
 
   useEffect(() => {
+    // Restore first: drawings stack, so always draw on the clean original
+    restoreFavicon();
     if (count > 0) {
-      drawOnFavicon(drawCircle, { fillColor: "red", radius: 40, x: 200, y: 200 });
-    } else {
-      restoreFavicon();
+      drawOnFavicon(drawTextBubble, { label: String(count) });
     }
   }, [count, drawOnFavicon, restoreFavicon]);
 
@@ -67,6 +64,19 @@ drawOnFavicon((ctx, size) => {
 });
 ```
 
+In TypeScript, custom callbacks are fully typed — declare your options type once and both the callback and the options you pass are checked against it:
+
+```tsx
+import type { DrawCallback } from "react-usefavicon";
+
+const drawProgress: DrawCallback<{ fraction: number }> = (ctx, size, { fraction }) => {
+  ctx.fillStyle = "dodgerblue";
+  ctx.fillRect(0, size - 24, size * fraction, 24);
+};
+
+drawOnFavicon(drawProgress, { fraction: 0.6 });
+```
+
 #### Options
 
 | Option | Type | Default | Description |
@@ -76,6 +86,8 @@ drawOnFavicon((ctx, size) => {
 | `...rest` | `any` | — | Passed through as the third argument to your draw callback |
 
 If you call `drawOnFavicon` multiple times, drawings stack. Call `restoreFavicon()` first to draw on the clean original.
+
+`drawOnFavicon` returns a promise that resolves once the favicon is updated. If the current favicon can't be loaded as the background (missing, or cross-origin without CORS headers), the promise still resolves — your drawing lands on a blank canvas instead of rejecting.
 
 ### Built-in draw functions
 
@@ -103,7 +115,7 @@ drawOnFavicon(drawTextBubble, { label: "3", color: "orangered", fontSize: 128, f
 drawOnFavicon(drawSquare, { fillColor: "black", length: 50, x: 200, y: 200 });
 ```
 
-All options have sensible defaults, when you call `drawOnFavicon(drawCircle)` with no options, a red dot appears in the bottom-right corner.
+All options have sensible defaults — when you call `drawOnFavicon(drawCircle)` with no options, a red dot appears in the bottom-right corner.
 
 ### Set an emoji favicon
 
@@ -186,3 +198,4 @@ Rule of thumb: render a `<link>` when the whole icon swaps between known URLs, a
 ## Ideas
 
 - [Dark mode for SVG favicon with `prefers-color-scheme`](https://blog.tomayac.com/2019/09/21/prefers-color-scheme-in-svg-favicons-for-dark-mode-icons/)
+- A declarative variant for React 19: a `useFaviconHref(drawCallback)` hook that returns a data-URI string you render yourself via `<link rel="icon" href={href} />`, so React owns the element end-to-end and nothing is mutated out-of-band
