@@ -1,2 +1,5 @@
-node_modules
-build
+dist
+demo/dist
+demo/.parcel-cache
+package-lock.json
+demo/package-lock.json

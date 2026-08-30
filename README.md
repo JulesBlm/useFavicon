@@ -83,7 +83,7 @@ drawOnFavicon(drawProgress, { fraction: 0.6 });
 |---|---|---|---|
 | `faviconSize` | `number` | `256` | Canvas size in px |
 | `clear` | `boolean` | `false` | Start with a blank canvas instead of drawing over the current favicon |
-| `...rest` | `any` | — | Passed through as the third argument to your draw callback |
+| `...rest` | inferred | — | Passed through as the third argument to your draw callback, type-checked against the callback's option type |
 
 If you call `drawOnFavicon` multiple times, drawings stack. Call `restoreFavicon()` first to draw on the clean original.
 
