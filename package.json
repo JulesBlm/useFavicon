@@ -4,21 +4,18 @@
   "author": "Jules Blom (https://twitter.com/Mega_Jules)",
   "private": false,
   "homepage": "https://jules.engineer/usefavicon",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/JulesBlm/useFavicon.git"
   },
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -46,18 +43,6 @@
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "prettier": {
     "trailingComma": "all",
     "semi": true
@@ -83,6 +68,11 @@
   "peerDependencies": {
     "react": ">= 18.0.0",
     "react-dom": ">= 18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    }
   },
   "files": [
     "src",

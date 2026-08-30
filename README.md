@@ -25,7 +25,7 @@ npm install react-usefavicon
 ```js
 import { useFavicon, emojiSvg } from "react-usefavicon";
 
-const { drawOnFavicon, restoreFavicon, setFaviconHref, svgToFavicon } = useFavicon();
+const { drawOnFavicon, restoreFavicon, setFaviconHref } = useFavicon();
 ```
 
 Returns an object of stable handler functions.
@@ -136,15 +136,16 @@ setFaviconHref("/favicons/active.png");
 
 ### Render JSX SVG as favicon
 
+`svgToDataUri` is a standalone utility that renders any React element with an `<svg>` root to a data URI. Icon-library components (lucide-react, react-icons, …) work directly, so your favicon can reuse your app's icon system:
+
 ```jsx
-await svgToFavicon(
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="50" fill="tomato" />
-  </svg>
-);
+import { svgToDataUri } from "react-usefavicon";
+import { Activity } from "lucide-react";
+
+setFaviconHref(await svgToDataUri(<Activity color="tomato" />));
 ```
 
-The element is rendered with `react-dom/client` in a detached node and serialized. The `xmlns` attribute is added automatically, so you can omit it from your JSX. Only `<svg>` elements are accepted.
+The result is a plain string, so it also pairs with React 19's declarative `<link>` — serialize once and render it, no hook needed. The `xmlns` attribute is added during serialization, so your JSX may omit it. Client-only, and `react-dom` (an optional peer dependency) is loaded on demand the first time you call it.
 
 ### Restore the original favicon
 

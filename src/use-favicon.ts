@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from "react";
-import type { ReactSVGElement } from "react";
 
 const createCanvas = (faviconSize: number) => {
   const canvas = document.createElement("canvas");
@@ -18,11 +17,9 @@ export type DrawCallback<T extends object = Record<string, unknown>> = (
 export interface DrawOptions {
   faviconSize?: number;
   clear?: boolean;
-  [key: string]: unknown;
 }
 
 export interface UseFaviconHandlers {
-  svgToFavicon: (SvgEl: ReactSVGElement) => Promise<void>;
   restoreFavicon: () => void;
   drawOnFavicon: <T extends object = Record<string, unknown>>(
     drawCallback: DrawCallback<T>,
@@ -105,38 +102,6 @@ function useFavicon(): UseFaviconReturn {
     getFaviconLink().href = originalHref;
   }, []);
 
-  const svgToFavicon = useCallback(
-    async (SvgEl: ReactSVGElement) => {
-      if (SvgEl.type !== "svg")
-        throw Error("React element for 'svgToFavicon' must be of type 'svg'");
-
-      // Render with react-dom/client, which is already in every consumer's
-      // bundle, rather than pulling the react-dom/server renderer into the
-      // client. Dynamic imports keep react-dom out of the module graph for
-      // consumers who never call this function.
-      const [{ createRoot }, { flushSync }] = await Promise.all([
-        import("react-dom/client"),
-        import("react-dom"),
-      ]);
-
-      const container = document.createElement("div");
-      const root = createRoot(container);
-      try {
-        flushSync(() => root.render(SvgEl));
-        const svgNode = container.firstElementChild;
-        if (!svgNode) throw Error("Failed to render SVG element");
-
-        // XMLSerializer emits the SVG namespace even when the JSX omits
-        // xmlns, which a data: URI favicon requires
-        const markup = new XMLSerializer().serializeToString(svgNode);
-        setFaviconHref(`data:image/svg+xml,${encodeURIComponent(markup)}`);
-      } finally {
-        root.unmount();
-      }
-    },
-    [setFaviconHref],
-  );
-
   const drawOnFavicon = useCallback(
     async <T extends object = Record<string, unknown>>(
       drawCallback: DrawCallback<T>,
@@ -178,8 +143,7 @@ function useFavicon(): UseFaviconReturn {
     [],
   );
 
-  return { drawOnFavicon, restoreFavicon, setFaviconHref, svgToFavicon };
+  return { drawOnFavicon, restoreFavicon, setFaviconHref };
 }
 
 export { useFavicon };
-export default useFavicon;

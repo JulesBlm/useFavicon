@@ -1,5 +1,6 @@
 import React, { useState, useSyncExternalStore } from "react";
 import { useFavicon, emojiSvg } from "../../src/use-favicon";
+import { svgToDataUri } from "../../src/svg-to-data-uri";
 import { drawTextBubble, drawCircle, drawSquare } from "../../src/draw-functions";
 import type { UseFaviconReturn } from "../../src/use-favicon";
 import "./App.css";
@@ -87,7 +88,6 @@ function App() {
     setFaviconHref,
     restoreFavicon,
     drawOnFavicon,
-    svgToFavicon,
   } = useFavicon();
 
   const previewHref = useFaviconPreview();
@@ -243,17 +243,13 @@ function App() {
 
             <div className="Demo-Item">
               <p>
-                Construct a React SVG element with <abbr>JSX</abbr> and pass
-                that to <code>svgToFavicon()</code>, note{" "}
-                <mark>
-                  only React elements of type <code>svg</code>
-                </mark>{" "}
-                will work.
+                Render any React element with an <code>svg</code> root — like
+                your app's icon components — to a data URI with{" "}
+                <code>svgToDataUri()</code> and set it as the favicon.
               </p>
               <pre className="code-block">
                 <code>
                   {`const faviconSvgEl = (<svg
-  xmlns="http://www.w3.org/2000/svg"
   width="256"
   height="256"
   viewBox="0 0 100 100"
@@ -271,12 +267,15 @@ function App() {
   />
 </svg>)
 
-// from JSX to Favicon!
-svgToFavicon(faviconSvgEl)
+// from JSX to favicon!
+setFaviconHref(await svgToDataUri(faviconSvgEl))
 `}
                 </code>
               </pre>
-              <button className="Button" onClick={() => svgToFavicon(demoSvg)}>
+              <button
+                className="Button"
+                onClick={async () => setFaviconHref(await svgToDataUri(demoSvg))}
+              >
                 Set favicon with JSX
               </button>
             </div>
@@ -320,7 +319,6 @@ function App() {
     restoreFavicon,
     drawOnFavicon,
     setFaviconHref,
-    svgToFavicon,
   } = useFavicon();
 
   // ...
