@@ -8,7 +8,7 @@ react-usefavicon is a React hook to dynamically draw on your favicon. Composite 
 
 **Works with modern React frameworks**: Next.js (App Router & Pages Router), React Router, TanStack Router, Remix, and more. Fully SSR-safe!
 
-> **React 19 note**: If you just need to set a static favicon URL, React 19 supports rendering `<link rel="icon" href={href} />` directly in your components — React will hoist it to `<head>` for you. This hook is most valuable when you need to **draw on** the favicon using canvas (badges, overlays, dynamic text).
+> **React 19 note**: If you just need to set a static favicon URL, React 19 supports rendering `<link rel="icon" href={href} />` directly in your components — React will hoist it to `<head>` for you (see [React 19 and head elements](#react-19-and-head-elements)). This hook is most valuable when you need to **draw on** the favicon using canvas (badges, overlays, dynamic text).
 
 ## Installing
 
@@ -103,7 +103,7 @@ drawOnFavicon(drawTextBubble, { label: "3", color: "orangered", fontSize: 128, f
 drawOnFavicon(drawSquare, { fillColor: "black", length: 50, x: 200, y: 200 });
 ```
 
-All options have sensible defaults — you can call `drawOnFavicon(drawCircle)` with no options for a red dot in the bottom-right corner.
+All options have sensible defaults, when you call `drawOnFavicon(drawCircle)` with no options, a red dot appears in the bottom-right corner.
 
 ### Set an emoji favicon
 
@@ -132,7 +132,7 @@ await svgToFavicon(
 );
 ```
 
-The element is rendered with `react-dom/client` in a detached node and serialized — no server renderer is bundled. The `xmlns` attribute is added automatically, so you can omit it from your JSX. Only `<svg>` elements are accepted.
+The element is rendered with `react-dom/client` in a detached node and serialized. The `xmlns` attribute is added automatically, so you can omit it from your JSX. Only `<svg>` elements are accepted.
 
 ### Restore the original favicon
 
@@ -155,6 +155,23 @@ Your framework declares the *static* favicon; `useFavicon` mutates it at runtime
 The hook is fully SSR-safe: every handler no-ops on the server, and favicon discovery happens after hydration, so there are no hydration mismatches.
 
 If a client-side navigation replaces the favicon `<link>` element (for example, a route that defines its own icon), the hook adopts the new element and its href becomes the new restore baseline — see [Restore the original favicon](#restore-the-original-favicon).
+
+### React 19 and head elements
+
+React 19 [supports metadata tags natively](https://react.dev/blog/2024/12/05/react-19#support-for-metadata-tags): `<title>`, `<meta>`, and `<link>` rendered anywhere in your component tree are automatically hoisted into `<head>`. This works in client-only apps, streaming SSR, and Server Components, so plain JSX is now a perfectly good way to declare a favicon — including a state-driven one:
+
+```jsx
+function App({ status }) {
+  return <link rel="icon" href={`/favicons/${status}.svg`} />;
+}
+```
+
+Two details of [React's `<link>` handling](https://react.dev/reference/react-dom/components/link) matter for this hook:
+
+- **React does not deduplicate icon links.** Only stylesheets with a `precedence` prop get deduplication and load-ordering; `rel="icon"` links are just hoisted. If several components render an icon link — or your framework already declares one — they *all* end up in `<head>`, and the browser picks which to display by its own preference: SVG-typed links first, later links over earlier ones. The hook uses the same selection rule, so it mutates the link the browser is actually showing.
+- **A React-rendered icon link is still React's element.** The hook changes its `href` attribute out-of-band, which survives re-renders as long as the link's props stay the same. If you re-render the `<link>` with a different `href` prop, React's value wins and any drawing is overwritten; if the element unmounts, the hook re-discovers the favicon and adopts the replacement as its new restore baseline.
+
+Rule of thumb: render a `<link>` when the whole icon swaps between known URLs, and reach for the hook when you need to read the *current* favicon and composite on top of it — canvas drawing has no declarative equivalent.
 
 ## Credits & Inspiration
 
