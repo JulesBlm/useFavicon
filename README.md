@@ -132,7 +132,7 @@ await svgToFavicon(
 );
 ```
 
-This dynamically imports `react-dom/server` to render the SVG to a string. Only `<svg>` elements are accepted.
+The element is rendered with `react-dom/client` in a detached node and serialized — no server renderer is bundled. The `xmlns` attribute is added automatically, so you can omit it from your JSX. Only `<svg>` elements are accepted.
 
 ### Restore the original favicon
 
@@ -144,9 +144,17 @@ Resets the favicon to its original href.
 
 **What counts as "original":** the favicon's href as it was when the hook *first* touched the favicon — this baseline is shared by all `useFavicon()` instances on the page, so a component that mounts after another component has already drawn on the favicon still restores the true original, not the drawn-on version. If your framework replaces the favicon `<link>` element itself (for example on a route change to a page that defines its own favicon), the hook adopts the new element's href as the new original.
 
-## SSR
+## Usage with frameworks
 
-The hook is SSR-safe — it no-ops on the server and updates the favicon after hydration. In Next.js App Router, mark the component with `'use client'`.
+Your framework declares the *static* favicon; `useFavicon` mutates it at runtime. The two layer cleanly — keep declaring your favicon the way your framework wants, and use the hook for the dynamic states (badges, unread counts, progress) no framework has an API for.
+
+- **Next.js (App Router)** — declare your favicon via the [file conventions](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons) (`app/favicon.ico`, `app/icon.svg`) or `metadata.icons`. Next often emits *both* an `.ico` and an SVG icon link; the hook targets the link the browser actually displays (preferring the SVG one, as browsers do). Components using the hook are client components (`'use client'`).
+- **React Router / Remix** — declare the favicon in your root route's `links` export. Root links persist across client-side navigations, so the hook keeps working as users move around.
+- **TanStack Start / Router** — declare the favicon in your root route's `head()`. Same story.
+
+The hook is fully SSR-safe: every handler no-ops on the server, and favicon discovery happens after hydration, so there are no hydration mismatches.
+
+If a client-side navigation replaces the favicon `<link>` element (for example, a route that defines its own icon), the hook adopts the new element and its href becomes the new restore baseline — see [Restore the original favicon](#restore-the-original-favicon).
 
 ## Credits & Inspiration
 
