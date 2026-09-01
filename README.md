@@ -189,11 +189,8 @@ Rule of thumb: render a `<link>` when the whole icon swaps between known URLs, a
 ## Credits & Inspiration
 
 - [Joel Califa: Tiny Wins](https://joelcalifa.com/blog/tiny-wins/)
-- [CSS Tricks: Emojis as Favicons](https://css-tricks.com/emojis-as-favicons/)
-- [svg-crowbar](https://github.com/cy6erskunk/svg-crowbar/)
-- [MDN Canvas tutorial](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
-- [favicon-badge](https://glitch.com/edit/#!/favicon-badge?path=script.js%3A1%3A14)
 - [Tinycon](https://github.com/tommoor/tinycon/blob/master/tinycon.js)
+- [CSS Tricks: Emojis as Favicons](https://css-tricks.com/emojis-as-favicons/)
 - [react-favicon](https://github.com/oflisback/react-favicon)
 
 ## Ideas
