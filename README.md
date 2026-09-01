@@ -193,6 +193,3 @@ Rule of thumb: render a `<link>` when the whole icon swaps between known URLs, a
 - [CSS Tricks: Emojis as Favicons](https://css-tricks.com/emojis-as-favicons/)
 - [react-favicon](https://github.com/oflisback/react-favicon)
 
-## Ideas
-
-Future directions — a declarative React 19 API, WebGL/WebGPU rendering, animation, dark-mode SVGs — live in [V4.md](V4.md).
